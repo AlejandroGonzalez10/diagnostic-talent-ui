@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import FormCuestionario from './components/Cuestionario.vue'
+import FormCuestionario from './components/cuestionario/Cuestionario.vue'
 
 export default {
   name: 'App',

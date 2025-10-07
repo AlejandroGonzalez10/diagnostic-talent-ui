@@ -1,0 +1,89 @@
+.codigo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.codigo-form {
+  width: 100%;
+  max-width: 500px;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.codigo-form h2 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.codigo-instrucciones {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.codigo-input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.codigo-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.codigo-button {
+  padding: 0 2rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.codigo-button:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
+.codigo-error {
+  color: #dc3545;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .codigo-form {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .codigo-button {
+    width: 100%;
+    padding: 0.8rem;
+  }
+}
