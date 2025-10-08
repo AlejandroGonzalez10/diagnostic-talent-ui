@@ -37,6 +37,17 @@ class HttpClient {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('🌐 HTTP: Error del servidor:', errorText)
+        
+        // Si es error 403 y menciona token, limpiar autenticación
+        if (response.status === 403 && errorText.includes('token')) {
+          console.warn('🔐 Token inválido o expirado, limpiando autenticación...')
+          localStorage.removeItem('authToken')
+          localStorage.removeItem('authUser')
+          // Recargar la página para forzar re-autenticación
+          window.location.reload()
+          return
+        }
+        
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`)
       }
 
@@ -155,6 +166,7 @@ export const questionnaireApi = {
 
   async updateAnswer(data) {
     try {
+      // El ID va en el body, no en la URL
       return await httpClient.put(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
     } catch (error) {
       console.error('🌐 API: Error en updateAnswer:', error)
