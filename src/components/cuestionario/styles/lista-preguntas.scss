@@ -30,6 +30,7 @@
   line-height: 1.5;
   margin: 0;
   font-size: 1rem;
+  text-align: left;
 }
 
 .categoria-score {
@@ -92,14 +93,18 @@
 
 .pregunta-header {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-bottom: 1rem;
+  align-items: baseline;
 }
 
 .pregunta-numero {
   font-weight: 600;
   color: #2c3e50;
   font-size: 1.1rem;
+  min-width: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1.5;
 }
 
 .pregunta-texto {
@@ -108,6 +113,7 @@
   color: #2c3e50;
   line-height: 1.5;
   flex: 1;
+  text-align: left;
 }
 
 .pregunta-contenido {
@@ -116,17 +122,21 @@
   gap: 1.5rem;
   align-items: center;
   padding-left: 2rem;
+  justify-content: flex-start;
 }
 
 .valoracion-cualitativa {
   flex: 1;
   min-width: 300px;
+  text-align: left !important;
 }
 
 .opciones-grupo {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
+  justify-content: flex-start !important;
+  text-align: left !important;
 }
 
 .opcion-radio {
@@ -135,6 +145,7 @@
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
+  text-align: left !important;
 }
 
 .opcion-radio input[type="radio"] {
@@ -157,11 +168,15 @@
 .opcion-texto {
   font-size: 1rem;
   color: #2c3e50;
+  text-align: left;
 }
 
 .valoracion-cuantitativa {
   min-width: 120px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .valor-respuesta {
@@ -218,23 +233,25 @@
   
   .opciones-grupo {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    gap: 1rem;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .opcion-radio {
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: transparent;
     border: none;
     border-radius: 6px;
-    width: 100%;
+    width: auto;
     justify-content: flex-start;
     box-sizing: border-box;
     margin: 0;
-    max-width: 100%;
+    flex: 0 0 auto;
   }
 
   .opcion-radio:hover {
@@ -254,6 +271,7 @@
 
   .valoracion-cuantitativa {
     margin-top: 0;
+    margin-left: -20px;
     width: 100%;
     text-align: center;
     padding: 0.5rem;

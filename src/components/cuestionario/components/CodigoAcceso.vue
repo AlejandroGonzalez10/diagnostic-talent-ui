@@ -12,35 +12,66 @@
           :class="{ 'error': error }"
           @keyup.enter="validar"
           autocomplete="off"
+          :disabled="cargando"
         />
-        <button @click="validar" class="codigo-button">
-          Ingresar
+        <button @click="validar" class="codigo-button" :disabled="cargando">
+          {{ cargando ? 'Validando...' : 'Ingresar' }}
         </button>
       </div>
       <p v-if="error" class="codigo-error">
-        <span>⚠️</span> Código incorrecto. Por favor, verifique e intente nuevamente.
+        <span>⚠️</span> {{ mensajeError }}
       </p>
     </div>
   </div>
 </template>
 
 <script>
+import { cuestionarioApi } from '@/services/api'
+
 export default {
   name: 'CodigoAcceso',
   data() {
     return {
       codigo: '',
-      error: false
+      error: false,
+      cargando: false,
+      mensajeError: 'Código incorrecto. Por favor, verifique e intente nuevamente.'
     }
   },
   methods: {
-    validar() {
-      if (this.codigo?.trim() === 'Bootcamp1') {
-        this.$emit('codigo-validado')
-        localStorage.setItem('codigoValidado', 'true')
-        this.error = false
-      } else {
+    async validar() {
+      if (!this.codigo?.trim()) {
         this.error = true
+        this.mensajeError = 'Por favor, ingrese un código de acceso.'
+        return
+      }
+
+      this.cargando = true
+      this.error = false
+
+      try {
+        console.log('🔐 Validando código:', this.codigo)
+        const response = await cuestionarioApi.autenticar(this.codigo.trim())
+        
+        if (response.token && response.user) {
+          console.log('🔐 Autenticación exitosa:', response)
+          
+          // Emitir evento con datos de autenticación
+          this.$emit('codigo-validado', {
+            token: response.token,
+            user: response.user
+          })
+          
+          this.error = false
+        } else {
+          throw new Error('Respuesta de autenticación inválida')
+        }
+      } catch (error) {
+        console.error('🔐 Error en autenticación:', error)
+        this.error = true
+        this.mensajeError = 'Código de acceso inválido. Por favor, verifique e intente nuevamente.'
+      } finally {
+        this.cargando = false
       }
     }
   }

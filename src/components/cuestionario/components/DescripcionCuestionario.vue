@@ -65,25 +65,33 @@ export default {
 
 <style scoped>
 .form-header {
-  margin-bottom: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-header h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  font-weight: bold;
 }
 
 .descripcion-diagnostico {
-  margin: 1.5rem 0;
+  margin: 0.1rem 0 3rem 0;
   text-align: justify;
 }
 
 .descripcion-diagnostico p {
-  margin-bottom: 1rem;
-  line-height: 1.5;
+  margin-bottom: 0.1rem;
+  line-height: 1.3;
 }
 
 .pilares-analisis {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .pilares-analisis h3 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
   text-align: center;
 }
@@ -93,7 +101,7 @@ export default {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .pilares-analisis li {

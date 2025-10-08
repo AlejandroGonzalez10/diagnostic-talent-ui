@@ -26,7 +26,7 @@
                          :name="'pregunta' + pregunta.id"
                          :value="opcion.value"
                          v-model="respuestasLocales[pregunta.id]"
-                         @change="emitirCambios" />
+                         @change="onRespuestaChange(pregunta.id, $event.target.value)" />
                   <span class="opcion-texto">{{ opcion.option }}</span>
                 </label>
               </div>
@@ -78,6 +78,10 @@ export default {
       type: Array,
       required: true,
       default: () => []
+    },
+    guardarRespuesta: {
+      type: Function,
+      required: true
     }
   },
   emits: ['update:respuestas', 'respuestas-cambio'],
@@ -112,13 +116,22 @@ export default {
       return promedio.toFixed(2)
     },
     calcularPuntajePregunta(respuesta, opciones = this.opciones) {
+      console.log('🔍 DEBUG - calcularPuntajePregunta:', {
+        respuesta,
+        opciones,
+        opcionesLength: opciones.length
+      })
+      
       const opcion = opciones.find(opt => opt.value === respuesta)
+      console.log('🔍 DEBUG - Opción encontrada:', opcion)
       
       if (opcion) {
-        const puntaje = opcion.points !== undefined ? opcion.points : opcion.value
+        const puntaje = opcion.value
+        console.log('🔍 DEBUG - Puntaje calculado:', puntaje)
         return Number(puntaje) || 0
       }
       
+      // Fallback para valores hardcodeados
       switch(respuesta) {
         case 'Si': return 5
         case 'En Parte': return 3
@@ -164,6 +177,19 @@ export default {
 
       const promedioPonderado = puntajeTotal / pesoTotal
       return promedioPonderado.toFixed(2)
+    },
+    onRespuestaChange(preguntaId, valor) {
+      console.log('🎯 Opción seleccionada:', { preguntaId, valor })
+      
+      // Verificar qué puntaje se calcula para esta respuesta
+      const puntajeCalculado = this.calcularPuntajePregunta(valor, this.opciones)
+      console.log('🎯 Puntaje calculado para esta respuesta:', puntajeCalculado)
+      
+      // Usar la función pasada como prop
+      this.guardarRespuesta(preguntaId, valor)
+      
+      // Mantener la funcionalidad existente
+      this.emitirCambios()
     },
     emitirCambios() {
       this.$emit('update:respuestas', this.respuestasLocales)

@@ -17,20 +17,29 @@ class HttpClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
+    // Obtener token del localStorage
+    const token = localStorage.getItem('authToken')
+    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {}
+
     try {
+      console.log('🌐 HTTP: Solicitud a', `${this.baseURL}${url}`)
       const response = await fetch(`${this.baseURL}${url}`, {
         ...options,
         headers: {
           ...this.headers,
+          ...authHeaders,
           ...options.headers
         },
         signal: controller.signal
       })
 
       clearTimeout(timeoutId)
+      console.log('🌐 HTTP: Respuesta recibida con status:', response.status)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        console.error('🌐 HTTP: Error del servidor:', errorText)
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`)
       }
 
       return await response.json()
@@ -39,6 +48,7 @@ class HttpClient {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout')
       }
+      console.error('🌐 HTTP: Error en request:', error)
       throw error
     }
   }
@@ -48,6 +58,7 @@ class HttpClient {
   }
 
   post(url, data = {}, options = {}) {
+    console.log('🌐 HTTP: POST a', url, 'con datos:', data)
     return this.request(url, {
       ...options,
       method: 'POST',
@@ -71,10 +82,12 @@ class HttpClient {
 const httpClient = new HttpClient(API_CONFIG)
 
 const ENDPOINTS = {
+  AUTH: '/users/auth',
   CATEGORIES: '/quiestionaire/categories',
   QUESTIONS: '/quiestionaire/questions',
   OPTIONS: '/quiestionaire/options',
-  RESPONSES: '/quiestionaire/responses'
+  QUESTIONNAIRE: '/quiestionaire',
+  QUESTIONNAIRE_ANSWER: '/quiestionaire/answer'
 }
 
 export const categoriesApi = {
@@ -115,17 +128,71 @@ export const optionsApi = {
   }
 }
 
-export const responsesApi = {
+export const questionnaireApi = {
   async submit(data) {
     try {
-      return await httpClient.post(ENDPOINTS.RESPONSES, data)
+      console.log('🌐 API: Enviando datos generales a', ENDPOINTS.QUESTIONNAIRE)
+      console.log('🌐 API: Datos a enviar:', data)
+      return await httpClient.post(ENDPOINTS.QUESTIONNAIRE, data)
     } catch (error) {
-      throw new Error('No se pudieron enviar las respuestas')
+      console.error('🌐 API: Error en submit:', error)
+      throw new Error('No se pudieron enviar los datos generales')
+    }
+  },
+
+  async update(data) {
+    try {
+      console.log('🌐 API: Actualizando datos generales a', ENDPOINTS.QUESTIONNAIRE)
+      console.log('🌐 API: Datos a actualizar:', data)
+      return await httpClient.put(ENDPOINTS.QUESTIONNAIRE, data)
+    } catch (error) {
+      console.error('🌐 API: Error en update:', error)
+      throw new Error('No se pudieron actualizar los datos generales')
+    }
+  },
+
+  async submitAnswer(data) {
+    try {
+      console.log('🌐 API: Enviando respuesta a', ENDPOINTS.QUESTIONNAIRE_ANSWER)
+      console.log('🌐 API: Datos a enviar:', data)
+      return await httpClient.post(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
+    } catch (error) {
+      console.error('🌐 API: Error en submitAnswer:', error)
+      throw new Error('No se pudo enviar la respuesta')
+    }
+  },
+
+  async updateAnswer(data) {
+    try {
+      console.log('🌐 API: Actualizando respuesta a', ENDPOINTS.QUESTIONNAIRE_ANSWER)
+      console.log('🌐 API: Datos a actualizar:', data)
+      return await httpClient.put(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
+    } catch (error) {
+      console.error('🌐 API: Error en updateAnswer:', error)
+      throw new Error('No se pudo actualizar la respuesta')
+    }
+  }
+}
+
+export const authApi = {
+  async authenticate(code) {
+    try {
+      console.log('🔐 AUTH: Enviando código de autenticación:', code)
+      const response = await httpClient.post(ENDPOINTS.AUTH, { code })
+      console.log('🔐 AUTH: Respuesta de autenticación:', response)
+      return response
+    } catch (error) {
+      console.error('🔐 AUTH: Error en autenticación:', error)
+      throw new Error('Código de acceso inválido')
     }
   }
 }
 
 export const cuestionarioApi = {
+  async autenticar(codigo) {
+    return authApi.authenticate(codigo)
+  },
+
   async obtenerCategorias() {
     return categoriesApi.getAll()
   },
@@ -138,7 +205,24 @@ export const cuestionarioApi = {
     return optionsApi.getAll()
   },
 
-  async enviarRespuestas(data) {
-    return responsesApi.submit(data)
+  async enviarDatosGenerales(data) {
+    return questionnaireApi.submit(data)
+  },
+
+  async actualizarDatosGenerales(data) {
+    return questionnaireApi.update(data)
+  },
+
+  async enviarRespuesta(data) {
+    return questionnaireApi.submitAnswer(data)
+  },
+
+  async actualizarRespuesta(data) {
+    return questionnaireApi.updateAnswer(data)
+  },
+
+  async crearRegistroInicial() {
+    // Envía datos vacíos para crear el registro inicial y obtener el ID
+    return questionnaireApi.submit({})
   }
 }

@@ -20,12 +20,13 @@
 
     <!-- Main form -->
     <div v-else class="main-form-container">
-      <form @submit.prevent="submitForm" class="main-form">
+      <div class="main-form">
         <descripcion-cuestionario :categorias="categorias" />
         
         <formulario-datos
           v-model:datos="datosUsuario"
           @validacion-cambio="datosValidos = $event"
+          @datos-enviados="onDatosEnviados"
         />
 
         <lista-preguntas
@@ -35,16 +36,9 @@
           :opciones="opciones"
           v-model:respuestas="respuestas"
           @respuestas-cambio="validarRespuestas"
+          :guardar-respuesta="guardarRespuesta"
         />
-
-        <button 
-          type="submit" 
-          class="submit-button" 
-          :disabled="enviando || !formularioCompleto"
-        >
-          {{ enviando ? 'Enviando...' : 'Enviar Respuestas' }}
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -76,12 +70,17 @@ export default {
       formularioCompleto,
       cargarDatosGuardados,
       fetchPreguntas,
-      enviarRespuestas,
-      validarRespuestas
+      setGeneralDataId,
+      guardarRespuesta,
+      validarRespuestas,
+      // Variables de autenticación
+      token,
+      usuario,
+      isAuthenticated,
+      autenticar
     } = useCuestionario()
 
     const codigoValidado = ref(false)
-    const enviando = ref(false)
     const datosUsuario = ref({
       entidad: '',
       nit: '',
@@ -89,49 +88,35 @@ export default {
       empleados: '',
       nombre: '',
       cargo: '',
-      correo: '',
-      contacto: ''
+      correo: ''
     })
     const datosValidos = ref(false)
 
-    const iniciarCuestionario = () => {
+    const iniciarCuestionario = (authData) => {
+      console.log('🔐 Iniciando cuestionario con datos de auth:', authData)
+      
+      // Guardar datos de autenticación
+      autenticar(authData)
+      
       codigoValidado.value = true
       fetchPreguntas()
     }
 
-    const submitForm = async () => {
-      if (!datosValidos.value || !formularioCompleto.value) {
-        alert('Por favor, complete todos los campos del formulario correctamente.')
-        return
-      }
-
-      try {
-        enviando.value = true
-        await enviarRespuestas(datosUsuario.value)
-        alert('Respuestas enviadas exitosamente')
-        
-        localStorage.removeItem('codigoValidado')
-        codigoValidado.value = false
-      } catch (error) {
-        alert('Error al enviar las respuestas. Por favor, intente nuevamente.')
-      } finally {
-        enviando.value = false
-      }
+    const onDatosEnviados = (generalDataId) => {
+      console.log('📨 Datos enviados recibidos en componente principal:', generalDataId)
+      setGeneralDataId(generalDataId)
     }
 
     onMounted(() => {
-      const codigoGuardado = localStorage.getItem('codigoValidado')
-      if (codigoGuardado === 'true') {
+      // Cargar datos guardados primero
+      cargarDatosGuardados()
+      
+      // Verificar si ya está autenticado
+      if (isAuthenticated.value && token.value) {
+        console.log('🔐 Usuario ya autenticado, iniciando cuestionario')
         codigoValidado.value = true
         fetchPreguntas()
       }
-      
-      const datosGuardados = localStorage.getItem('datosUsuario')
-      if (datosGuardados) {
-        datosUsuario.value = JSON.parse(datosGuardados)
-      }
-      
-      cargarDatosGuardados()
     })
 
     return {
@@ -143,14 +128,16 @@ export default {
       categorias,
       preguntasPorCategoria,
       respuestas,
-      enviando,
       formularioCompleto,
       opciones,
+      token,
+      usuario,
+      isAuthenticated,
       iniciarCuestionario,
       fetchPreguntas,
-      enviarRespuestas,
       validarRespuestas,
-      submitForm
+      guardarRespuesta,
+      onDatosEnviados
     }
   }
 }

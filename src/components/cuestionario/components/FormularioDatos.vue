@@ -13,7 +13,7 @@
               id="entidadEjecutora"
               v-model="datosLocales.entidad"
               :class="{ 'error': errores.entidad }"
-              @input="validarCampo('entidad')"
+              @blur="actualizarCampo('entidad')"
               required
             />
           </div>
@@ -25,7 +25,7 @@
               id="nit"
               v-model="datosLocales.nit"
               :class="{ 'error': errores.nit }"
-              @input="validarCampo('nit')"
+              @blur="actualizarCampo('nit')"
               required
             />
           </div>
@@ -37,7 +37,7 @@
               id="sector"
               v-model="datosLocales.sector"
               :class="{ 'error': errores.sector }"
-              @input="validarCampo('sector')"
+              @blur="actualizarCampo('sector')"
               required
             />
           </div>
@@ -49,7 +49,7 @@
               id="empleados"
               v-model="datosLocales.empleados"
               :class="{ 'error': errores.empleados }"
-              @input="validarCampo('empleados')"
+              @blur="actualizarCampo('empleados')"
               required
             />
           </div>
@@ -67,7 +67,7 @@
               id="nombre"
               v-model="datosLocales.nombre"
               :class="{ 'error': errores.nombre }"
-              @input="validarCampo('nombre')"
+              @blur="actualizarCampo('nombre')"
               required
             />
           </div>
@@ -79,7 +79,7 @@
               id="cargo"
               v-model="datosLocales.cargo"
               :class="{ 'error': errores.cargo }"
-              @input="validarCampo('cargo')"
+              @blur="actualizarCampo('cargo')"
               required
             />
           </div>
@@ -91,7 +91,7 @@
               id="correo"
               v-model="datosLocales.correo"
               :class="{ 'error': errores.correo }"
-              @input="validarCampo('correo')"
+              @blur="actualizarCampo('correo')"
               required
             />
           </div>
@@ -106,15 +106,15 @@
         <p v-if="errores.nombre" class="error-mensaje">Por favor, ingrese el nombre completo</p>
         <p v-if="errores.cargo" class="error-mensaje">Por favor, ingrese el cargo</p>
         <p v-if="errores.correo" class="error-mensaje">Por favor, ingrese un correo electrónico válido</p>
-        <p v-if="errores.contacto" class="error-mensaje">Por favor, ingrese un número de contacto</p>
       </div>
     </div>
   </section>
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useValidacion } from '@/composables/useValidacion'
+import { cuestionarioApi } from '@/services/api'
 
 export default {
   name: 'FormularioDatos',
@@ -128,12 +128,11 @@ export default {
         empleados: '',
         nombre: '',
         cargo: '',
-        correo: '',
-        contacto: ''
+        correo: ''
       })
     }
   },
-  emits: ['update:datos', 'validacion-cambio'],
+  emits: ['update:datos', 'validacion-cambio', 'datos-enviados'],
   setup(props, { emit }) {
     const { validarEmail } = useValidacion()
     const datosLocales = ref({ ...props.datosIniciales })
@@ -144,35 +143,92 @@ export default {
       empleados: false,
       nombre: false,
       cargo: false,
-      correo: false,
-      contacto: false
+      correo: false
     })
+    const enviandoDatos = ref(false)
+    const registroCreado = ref(false)
+    const generalDataId = ref(null)
 
-    const validarCampo = (campo) => {
-      if (campo === 'correo') {
-        errores.value[campo] = !validarEmail(datosLocales.value[campo])
-      } else {
-        errores.value[campo] = !datosLocales.value[campo]?.toString().trim()
+    // Crear registro inicial cuando se monta el componente
+    const crearRegistroInicial = async () => {
+      if (registroCreado.value) return
+      
+      try {
+        console.log('🆕 Creando registro inicial...')
+        const respuesta = await cuestionarioApi.crearRegistroInicial()
+        console.log('✅ Registro inicial creado:', respuesta)
+        
+        generalDataId.value = respuesta.id
+        registroCreado.value = true
+        emit('datos-enviados', respuesta.id)
+      } catch (error) {
+        console.error('❌ Error al crear registro inicial:', error)
       }
+    }
+
+    const actualizarCampo = async (campo) => {
+      if (!registroCreado.value) {
+        console.log('⚠️ Registro no creado aún, creando primero...')
+        await crearRegistroInicial()
+      }
+
+      if (!generalDataId.value) {
+        console.log('⚠️ No hay ID de registro disponible')
+        return
+      }
+
+      const valor = datosLocales.value[campo]?.toString().trim()
+      
+      // Validar el campo
+      if (campo === 'correo') {
+        errores.value[campo] = valor.length > 0 ? !validarEmail(valor) : false
+      } else {
+        errores.value[campo] = false
+      }
+
+      // Si el campo está vacío, no enviar actualización
+      if (!valor) {
+        emit('update:datos', datosLocales.value)
+        return
+      }
+
+      try {
+        enviandoDatos.value = true
+        
+        // Enviar TODOS los datos del formulario, no solo el campo que cambió
+        const datosActualizacion = {
+          id: generalDataId.value,
+          company: datosLocales.value.entidad || '',
+          nit: datosLocales.value.nit || '',
+          sector: datosLocales.value.sector || '',
+          employees_number: datosLocales.value.empleados ? parseInt(datosLocales.value.empleados) : 0,
+          chief_name: datosLocales.value.nombre || '',
+          company_role: datosLocales.value.cargo || '',
+          chief_email: datosLocales.value.correo || ''
+        }
+
+        console.log(`📝 Actualizando todos los datos (disparado por campo ${campo}):`, datosActualizacion)
+        
+        await cuestionarioApi.actualizarDatosGenerales(datosActualizacion)
+        console.log(`✅ Todos los datos actualizados correctamente`)
+        
+      } catch (error) {
+        console.error(`❌ Error al actualizar datos:`, error)
+      } finally {
+        enviandoDatos.value = false
+      }
+
       emit('update:datos', datosLocales.value)
-      validarFormulario()
     }
 
-    const validarFormulario = () => {
-      const esValido = !Object.values(errores.value).some(error => error)
-      emit('validacion-cambio', esValido)
-      return esValido
-    }
-
-    watch(datosLocales, () => {
-      localStorage.setItem('datosUsuario', JSON.stringify(datosLocales.value))
-    }, { deep: true })
+    // Crear registro inicial cuando se monta el componente
+    crearRegistroInicial()
 
     return {
       datosLocales,
       errores,
-      validarCampo,
-      validarFormulario
+      enviandoDatos,
+      actualizarCampo
     }
   }
 }
