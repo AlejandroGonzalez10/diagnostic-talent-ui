@@ -11,6 +11,7 @@
              :key="pregunta.id"
              class="pregunta-item"
              :class="{ 'respondida': respuestasLocales[pregunta.id] }">
+          <div class="pregunta-numero-mobile">{{ index + 1 }}</div>
           <div class="pregunta-header">
             <span class="pregunta-numero">{{ index + 1 }}.</span>
             <p class="pregunta-texto">{{ pregunta.label }}</p>
@@ -43,7 +44,7 @@
         </div>
         
         <div class="categoria-score">
-          <span>Puntaje de la categoría:</span>
+          <span>Puntaje del pilar:</span>
           <strong>{{ calcularPuntajeCategoria(categoria.id) }}</strong>
         </div>
       </div>
