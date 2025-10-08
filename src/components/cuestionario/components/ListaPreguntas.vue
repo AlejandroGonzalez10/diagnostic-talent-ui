@@ -116,18 +116,10 @@ export default {
       return promedio.toFixed(2)
     },
     calcularPuntajePregunta(respuesta, opciones = this.opciones) {
-      console.log('🔍 DEBUG - calcularPuntajePregunta:', {
-        respuesta,
-        opciones,
-        opcionesLength: opciones.length
-      })
-      
       const opcion = opciones.find(opt => opt.value === respuesta)
-      console.log('🔍 DEBUG - Opción encontrada:', opcion)
       
       if (opcion) {
         const puntaje = opcion.value
-        console.log('🔍 DEBUG - Puntaje calculado:', puntaje)
         return Number(puntaje) || 0
       }
       
@@ -179,12 +171,6 @@ export default {
       return promedioPonderado.toFixed(2)
     },
     onRespuestaChange(preguntaId, valor) {
-      console.log('🎯 Opción seleccionada:', { preguntaId, valor })
-      
-      // Verificar qué puntaje se calcula para esta respuesta
-      const puntajeCalculado = this.calcularPuntajePregunta(valor, this.opciones)
-      console.log('🎯 Puntaje calculado para esta respuesta:', puntajeCalculado)
-      
       // Usar la función pasada como prop
       this.guardarRespuesta(preguntaId, valor)
       

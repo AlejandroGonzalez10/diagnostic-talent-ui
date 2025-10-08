@@ -22,7 +22,6 @@ class HttpClient {
     const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {}
 
     try {
-      console.log('🌐 HTTP: Solicitud a', `${this.baseURL}${url}`)
       const response = await fetch(`${this.baseURL}${url}`, {
         ...options,
         headers: {
@@ -34,7 +33,6 @@ class HttpClient {
       })
 
       clearTimeout(timeoutId)
-      console.log('🌐 HTTP: Respuesta recibida con status:', response.status)
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -58,7 +56,6 @@ class HttpClient {
   }
 
   post(url, data = {}, options = {}) {
-    console.log('🌐 HTTP: POST a', url, 'con datos:', data)
     return this.request(url, {
       ...options,
       method: 'POST',
@@ -131,8 +128,6 @@ export const optionsApi = {
 export const questionnaireApi = {
   async submit(data) {
     try {
-      console.log('🌐 API: Enviando datos generales a', ENDPOINTS.QUESTIONNAIRE)
-      console.log('🌐 API: Datos a enviar:', data)
       return await httpClient.post(ENDPOINTS.QUESTIONNAIRE, data)
     } catch (error) {
       console.error('🌐 API: Error en submit:', error)
@@ -142,8 +137,6 @@ export const questionnaireApi = {
 
   async update(data) {
     try {
-      console.log('🌐 API: Actualizando datos generales a', ENDPOINTS.QUESTIONNAIRE)
-      console.log('🌐 API: Datos a actualizar:', data)
       return await httpClient.put(ENDPOINTS.QUESTIONNAIRE, data)
     } catch (error) {
       console.error('🌐 API: Error en update:', error)
@@ -153,8 +146,6 @@ export const questionnaireApi = {
 
   async submitAnswer(data) {
     try {
-      console.log('🌐 API: Enviando respuesta a', ENDPOINTS.QUESTIONNAIRE_ANSWER)
-      console.log('🌐 API: Datos a enviar:', data)
       return await httpClient.post(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
     } catch (error) {
       console.error('🌐 API: Error en submitAnswer:', error)
@@ -164,8 +155,6 @@ export const questionnaireApi = {
 
   async updateAnswer(data) {
     try {
-      console.log('🌐 API: Actualizando respuesta a', ENDPOINTS.QUESTIONNAIRE_ANSWER)
-      console.log('🌐 API: Datos a actualizar:', data)
       return await httpClient.put(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
     } catch (error) {
       console.error('🌐 API: Error en updateAnswer:', error)
@@ -177,9 +166,7 @@ export const questionnaireApi = {
 export const authApi = {
   async authenticate(code) {
     try {
-      console.log('🔐 AUTH: Enviando código de autenticación:', code)
       const response = await httpClient.post(ENDPOINTS.AUTH, { code })
-      console.log('🔐 AUTH: Respuesta de autenticación:', response)
       return response
     } catch (error) {
       console.error('🔐 AUTH: Error en autenticación:', error)

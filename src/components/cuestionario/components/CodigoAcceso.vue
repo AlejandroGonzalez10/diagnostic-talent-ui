@@ -50,12 +50,9 @@ export default {
       this.error = false
 
       try {
-        console.log('🔐 Validando código:', this.codigo)
         const response = await cuestionarioApi.autenticar(this.codigo.trim())
         
         if (response.token && response.user) {
-          console.log('🔐 Autenticación exitosa:', response)
-          
           // Emitir evento con datos de autenticación
           this.$emit('codigo-validado', {
             token: response.token,

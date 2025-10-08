@@ -93,8 +93,6 @@ export default {
     const datosValidos = ref(false)
 
     const iniciarCuestionario = (authData) => {
-      console.log('🔐 Iniciando cuestionario con datos de auth:', authData)
-      
       // Guardar datos de autenticación
       autenticar(authData)
       
@@ -103,7 +101,6 @@ export default {
     }
 
     const onDatosEnviados = (generalDataId) => {
-      console.log('📨 Datos enviados recibidos en componente principal:', generalDataId)
       setGeneralDataId(generalDataId)
     }
 
@@ -113,7 +110,6 @@ export default {
       
       // Verificar si ya está autenticado
       if (isAuthenticated.value && token.value) {
-        console.log('🔐 Usuario ya autenticado, iniciando cuestionario')
         codigoValidado.value = true
         fetchPreguntas()
       }

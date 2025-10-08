@@ -154,9 +154,7 @@ export default {
       if (registroCreado.value) return
       
       try {
-        console.log('🆕 Creando registro inicial...')
         const respuesta = await cuestionarioApi.crearRegistroInicial()
-        console.log('✅ Registro inicial creado:', respuesta)
         
         generalDataId.value = respuesta.id
         registroCreado.value = true
@@ -168,12 +166,10 @@ export default {
 
     const actualizarCampo = async (campo) => {
       if (!registroCreado.value) {
-        console.log('⚠️ Registro no creado aún, creando primero...')
         await crearRegistroInicial()
       }
 
       if (!generalDataId.value) {
-        console.log('⚠️ No hay ID de registro disponible')
         return
       }
 
@@ -207,10 +203,7 @@ export default {
           chief_email: datosLocales.value.correo || ''
         }
 
-        console.log(`📝 Actualizando todos los datos (disparado por campo ${campo}):`, datosActualizacion)
-        
         await cuestionarioApi.actualizarDatosGenerales(datosActualizacion)
-        console.log(`✅ Todos los datos actualizados correctamente`)
         
       } catch (error) {
         console.error(`❌ Error al actualizar datos:`, error)
