@@ -1,5 +1,4 @@
 .datos-iniciales {
-  width: 100%;
   margin-bottom: 2rem;
 }
 
@@ -19,12 +18,17 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .datos-subsection {
-  padding: 2rem;
   background: #f8f9fa;
   border-radius: 8px;
+  padding: 2rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .datos-subsection h3 {
@@ -37,12 +41,15 @@
 
 .datos-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  max-width: 100%;
 }
 
 .form-group {
+  max-width: 100%;
   margin-bottom: 0;
+  box-sizing: border-box;
 }
 
 .form-group label {
@@ -60,8 +67,9 @@
   font-size: 1rem;
   color: #2d3748;
   background: white;
+  box-sizing: border-box;
+  max-width: 100%;
   transition: border-color 0.2s, box-shadow 0.2s;
-
 }
 
 .form-group input:focus {
@@ -93,21 +101,32 @@
 @media (min-width: 768px) {
   .datos-section {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 2rem;
+    padding: 2rem;
   }
 
   .datos-subsection {
-    flex: 1;
-    min-width: calc(50% - 1rem);
-  }
-
-
-  .datos-subsection {
+    width: 100%;
     padding: 1.5rem;
   }
 
   .datos-grid {
     gap: 1rem;
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 767px) {
+  .datos-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .datos-section {
+    padding: 1rem;
+  }
+  
+  .datos-subsection {
+    padding: 1.5rem;
   }
 }

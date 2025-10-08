@@ -2,20 +2,8 @@
   <div class="categorias-section">
     <div v-for="categoria in categorias" :key="categoria.id" class="categoria-wrapper">
       <div class="categoria-header">
-        <div class="categoria-titulo">
-          <h3>{{ categoria.nombre }}</h3>
-          <div class="categoria-indicadores">
-            <div class="categoria-peso">
-              <span class="indicador-label">Peso</span>
-              <span class="indicador-valor">{{ categoria.peso }}%</span>
-            </div>
-            <div class="categoria-score">
-              <span class="indicador-label">Puntaje</span>
-              <span class="indicador-valor">{{ calcularPuntajeCategoria(categoria.id) }}</span>
-            </div>
-          </div>
-        </div>
-        <p class="categoria-descripcion">{{ categoria.descripcion }}</p>
+        <h3 class="categoria-titulo">{{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
+        <p class="categoria-descripcion">{{ categoria.description || categoria.descripcion || categoria.desc || 'Sin descripción' }}</p>
       </div>
 
       <div class="preguntas-lista">
@@ -25,35 +13,21 @@
              :class="{ 'respondida': respuestasLocales[pregunta.id] }">
           <div class="pregunta-header">
             <span class="pregunta-numero">{{ index + 1 }}.</span>
-            <p class="pregunta-texto">{{ pregunta.texto }}</p>
+            <p class="pregunta-texto">{{ pregunta.label }}</p>
           </div>
           
           <div class="pregunta-contenido">
             <div class="valoracion-cualitativa">
               <div class="opciones-grupo">
-                <label class="opcion-radio">
+                <label v-for="opcion in opciones" 
+                       :key="opcion.id" 
+                       class="opcion-radio">
                   <input type="radio"
                          :name="'pregunta' + pregunta.id"
-                         value="Si"
+                         :value="opcion.value"
                          v-model="respuestasLocales[pregunta.id]"
                          @change="emitirCambios" />
-                  <span class="opcion-texto">Si</span>
-                </label>
-                <label class="opcion-radio">
-                  <input type="radio"
-                         :name="'pregunta' + pregunta.id"
-                         value="En Parte"
-                         v-model="respuestasLocales[pregunta.id]"
-                         @change="emitirCambios" />
-                  <span class="opcion-texto">En Parte</span>
-                </label>
-                <label class="opcion-radio">
-                  <input type="radio"
-                         :name="'pregunta' + pregunta.id"
-                         value="No"
-                         v-model="respuestasLocales[pregunta.id]"
-                         @change="emitirCambios" />
-                  <span class="opcion-texto">No</span>
+                  <span class="opcion-texto">{{ opcion.option }}</span>
                 </label>
               </div>
             </div>
@@ -62,10 +36,15 @@
               <span v-if="respuestasLocales[pregunta.id]" 
                     class="valor-respuesta"
                     :class="getValorClass(respuestasLocales[pregunta.id])">
-                {{ calcularPuntajePregunta(respuestasLocales[pregunta.id]) }} puntos
+                {{ calcularPuntajePregunta(respuestasLocales[pregunta.id], opciones) }} puntos
               </span>
             </div>
           </div>
+        </div>
+        
+        <div class="categoria-score">
+          <span>Puntaje de la categoría:</span>
+          <strong>{{ calcularPuntajeCategoria(categoria.id) }}</strong>
         </div>
       </div>
     </div>
@@ -94,6 +73,11 @@ export default {
     respuestas: {
       type: Object,
       default: () => ({})
+    },
+    opciones: {
+      type: Array,
+      required: true,
+      default: () => []
     }
   },
   emits: ['update:respuestas', 'respuestas-cambio'],
@@ -112,23 +96,29 @@ export default {
   },
   methods: {
     calcularPuntajeCategoria(categoriaId) {
-      // Implementar lógica de cálculo de puntaje por categoría
       const preguntas = this.preguntasPorCategoria[categoriaId] || []
+      if (preguntas.length === 0) return '0.00'
+
       let puntajeTotal = 0
-      let preguntasRespondidas = 0
 
       preguntas.forEach(pregunta => {
         const respuesta = this.respuestasLocales[pregunta.id]
         if (respuesta) {
-          puntajeTotal += this.calcularPuntajePregunta(respuesta)
-          preguntasRespondidas++
+          puntajeTotal += this.calcularPuntajePregunta(respuesta, this.opciones)
         }
       })
 
-      return preguntasRespondidas > 0 ? 
-        ((puntajeTotal / (preguntasRespondidas * 5)) * 100).toFixed(1) + '%' : '0%'
+      const promedio = puntajeTotal / preguntas.length
+      return promedio.toFixed(2)
     },
-    calcularPuntajePregunta(respuesta) {
+    calcularPuntajePregunta(respuesta, opciones = this.opciones) {
+      const opcion = opciones.find(opt => opt.value === respuesta)
+      
+      if (opcion) {
+        const puntaje = opcion.points !== undefined ? opcion.points : opcion.value
+        return Number(puntaje) || 0
+      }
+      
       switch(respuesta) {
         case 'Si': return 5
         case 'En Parte': return 3
@@ -137,36 +127,43 @@ export default {
       }
     },
     getValorClass(respuesta) {
-      switch(respuesta) {
-        case 'Si': return 'valor-alto'
-        case 'En Parte': return 'valor-medio'
-        case 'No': return 'valor-bajo'
-        default: return ''
-      }
+      const puntos = this.calcularPuntajePregunta(respuesta, this.opciones)
+      
+      if (puntos >= 5) return 'valor-alto'
+      if (puntos >= 3) return 'valor-medio'
+      if (puntos >= 1) return 'valor-bajo'
+      return ''
     },
     calcularPuntajeTotal() {
+      if (this.categorias.length === 0) return '0.00'
+
       let puntajeTotal = 0
+      let pesoTotal = 0
 
       this.categorias.forEach(categoria => {
         const preguntas = this.preguntasPorCategoria[categoria.id] || []
-        let puntajeCategoria = 0
-        let preguntasRespondidas = 0
+        if (preguntas.length > 0) {
+          let puntajeCategoria = 0
 
-        preguntas.forEach(pregunta => {
-          const respuesta = this.respuestasLocales[pregunta.id]
-          if (respuesta) {
-            puntajeCategoria += this.calcularPuntajePregunta(respuesta)
-            preguntasRespondidas++
-          }
-        })
+          preguntas.forEach(pregunta => {
+            const respuesta = this.respuestasLocales[pregunta.id]
+            if (respuesta) {
+              puntajeCategoria += this.calcularPuntajePregunta(respuesta, this.opciones)
+            }
+          })
 
-        if (preguntasRespondidas > 0) {
-          const porcentajeCategoria = (puntajeCategoria / (preguntasRespondidas * 5)) * 100
-          puntajeTotal += porcentajeCategoria * (categoria.peso / 100)
+          const promedioCategoria = puntajeCategoria / preguntas.length
+          const peso = categoria.weight || categoria.peso || 25
+          
+          puntajeTotal += promedioCategoria * (peso / 100)
+          pesoTotal += (peso / 100)
         }
       })
 
-      return puntajeTotal.toFixed(1) + '%'
+      if (pesoTotal === 0) return '0.00'
+
+      const promedioPonderado = puntajeTotal / pesoTotal
+      return promedioPonderado.toFixed(2)
     },
     emitirCambios() {
       this.$emit('update:respuestas', this.respuestasLocales)

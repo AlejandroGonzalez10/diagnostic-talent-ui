@@ -7,36 +7,42 @@
         actividades para la gestión del talento se convierten en un aspecto clave para alinear la
         planeación de personas con las metas del negocio.</p>
       
-      <p>Con este Diagnóstico digital de entorno laboral y los 6 pilares de análisis, se busca
+      <p>Con este <strong>Diagnóstico digital de entorno laboral</strong> y los <strong>6 pilares de análisis</strong>, se busca
         ofrecer una herramienta práctica y estructurada que permita por un lado, identificar brechas
         en políticas, procesos y prácticas de gestión que impacten la atracción, desarrollo y
         retención del capital humano; además de evaluar la efectividad en la estructuración de
         vacantes tácticas y estratégicas.</p>
       
-      <p>Este diagnóstico no constituye una evaluación de personas, sino un instrumento de
-        autogestión para la empresa. No debe interpretarse como un análisis profundo y detallado
+      <p>Este diagnóstico no constituye una evaluación de personas, sino un <strong>instrumento de
+        autogestión para la empresa</strong>. No debe interpretarse como un análisis profundo y detallado
         de la situación actual de la compañía, es un ejercicio orientativo.</p>
     </div>
     <div class="pilares-analisis">
       <h3>Pilares de análisis</h3>
       <ul>
-        <li>
+        <li v-for="categoria in categorias" :key="categoria.id">
+          <strong>{{ categoria.name || categoria.title || categoria.nombre }}: {{ categoria.weight || categoria.peso || 20 }}%</strong>
+          <p>{{ categoria.description || categoria.descripcion || categoria.desc }}</p>
+        </li>
+        
+        <!-- Fallback en caso de que no haya categorías cargadas -->
+        <li v-if="!categorias || categorias.length === 0">
           <strong>Perfil competitivo: 20%</strong>
           <p>Barreras y facilitadores en los procesos de convocatoria, atracción, selección y retención del talento</p>
         </li>
-        <li>
+        <li v-if="!categorias || categorias.length === 0">
           <strong>Servicios, sistemas y políticas: 20%</strong>
           <p>Evaluación de la normatividad, políticas que promueven los procesos de selección y retención</p>
         </li>
-        <li>
+        <li v-if="!categorias || categorias.length === 0">
           <strong>Marca Empleadora: 20%</strong>
           <p>Identificación de rasgos y comportamientos de la cultura organizacional y su impacto en la empresa</p>
         </li>
-        <li>
+        <li v-if="!categorias || categorias.length === 0">
           <strong>Tecnologías y Herramientas: 20%</strong>
           <p>Recursos tecnológicos, capacidad de innovación y adaptación a los cambios y demanda del mercado</p>
         </li>
-        <li>
+        <li v-if="!categorias || categorias.length === 0">
           <strong>Actualización de conocimiento y upskilling: 20%</strong>
           <p>Necesidades de formación y actualización en conocimiento del equipo de trabajo</p>
         </li>
@@ -47,7 +53,13 @@
 
 <script>
 export default {
-  name: 'DiagnosticDescription'
+  name: 'DiagnosticDescription',
+  props: {
+    categorias: {
+      type: Array,
+      default: () => []
+    }
+  }
 }
 </script>
 
@@ -88,7 +100,7 @@ export default {
   background: #f8f9fa;
   padding: 1.5rem;
   border-radius: 8px;
-  border-left: 4px solid #28a745;
+  border-left: 4px solid #FFC107;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

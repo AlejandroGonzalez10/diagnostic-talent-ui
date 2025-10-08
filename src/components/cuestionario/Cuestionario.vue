@@ -21,7 +21,7 @@
     <!-- Main form -->
     <div v-else class="main-form-container">
       <form @submit.prevent="submitForm" class="main-form">
-        <descripcion-cuestionario />
+        <descripcion-cuestionario :categorias="categorias" />
         
         <formulario-datos
           v-model:datos="datosUsuario"
@@ -32,6 +32,7 @@
           v-if="codigoValidado"
           :categorias="categorias"
           :preguntas-por-categoria="preguntasPorCategoria"
+          :opciones="opciones"
           v-model:respuestas="respuestas"
           @respuestas-cambio="validarRespuestas"
         />
@@ -50,7 +51,6 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { cuestionarioApi } from '@/services/api'
 import CodigoAcceso from './components/CodigoAcceso.vue'
 import FormularioDatos from './components/FormularioDatos.vue'
 import DescripcionCuestionario from './components/DescripcionCuestionario.vue'
@@ -69,12 +69,15 @@ export default {
     const {
       categorias,
       preguntasPorCategoria,
+      opciones,
       respuestas,
       isLoading,
       error,
       formularioCompleto,
       cargarDatosGuardados,
-      fetchPreguntas
+      fetchPreguntas,
+      enviarRespuestas,
+      validarRespuestas
     } = useCuestionario()
 
     const codigoValidado = ref(false)
@@ -104,16 +107,13 @@ export default {
 
       try {
         enviando.value = true
-        const resultado = await cuestionarioApi.enviarRespuestas(datosUsuario.value, respuestas.value)
-        alert(resultado.message)
+        await enviarRespuestas(datosUsuario.value)
+        alert('Respuestas enviadas exitosamente')
         
-        // Limpiar localStorage después de enviar exitosamente
         localStorage.removeItem('codigoValidado')
-        localStorage.removeItem('datosUsuario')
-        localStorage.removeItem('respuestas')
+        codigoValidado.value = false
       } catch (error) {
         alert('Error al enviar las respuestas. Por favor, intente nuevamente.')
-        console.error('Error:', error)
       } finally {
         enviando.value = false
       }
@@ -145,8 +145,11 @@ export default {
       respuestas,
       enviando,
       formularioCompleto,
+      opciones,
       iniciarCuestionario,
       fetchPreguntas,
+      enviarRespuestas,
+      validarRespuestas,
       submitForm
     }
   }

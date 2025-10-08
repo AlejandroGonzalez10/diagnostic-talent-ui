@@ -95,18 +95,6 @@
               required
             />
           </div>
-
-          <div class="form-group">
-            <label for="contacto">Teléfono de contacto</label>
-            <input
-              type="tel"
-              id="contacto"
-              v-model="datosLocales.contacto"
-              :class="{ 'error': errores.contacto }"
-              @input="validarCampo('contacto')"
-              required
-            />
-          </div>
         </div>
       </div>
 
