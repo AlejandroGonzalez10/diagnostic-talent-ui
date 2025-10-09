@@ -1,6 +1,6 @@
 .datos-iniciales {
-  margin-top: 4rem;
-  margin-bottom: 2rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
 }
 
 .datos-iniciales-titulo {
@@ -13,11 +13,9 @@
 .datos-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
+  padding: 1rem;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -103,8 +101,7 @@
   .datos-section {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 2rem;
+    padding: 1rem;
   }
 
   .datos-subsection {
@@ -124,7 +121,7 @@
   }
   
   .datos-section {
-    padding: 1rem;
+    padding: 0.8rem;
   }
   
   .datos-subsection {

@@ -1,13 +1,13 @@
 <template>
   <div class="form-header">
-    <h2>Diagnóstico digital de entorno laboral</h2>
+    <h2 class="title-banner">Diagnóstico digital de entorno laboral</h2>
     <div class="descripcion-diagnostico">
       <p>La gestión estratégica del talento humano es un pilar fundamental para garantizar la
         sostenibilidad, competitividad e innovación de las organizaciones. En este contexto, las
         actividades para la gestión del talento se convierten en un aspecto clave para alinear la
         planeación de personas con las metas del negocio.</p>
       
-      <p>Con este <strong>Diagnóstico digital de entorno laboral</strong> y los <strong>6 pilares de análisis</strong>, se busca
+      <p>Con este <strong>Diagnóstico digital de entorno laboral</strong> y los <strong>5 pilares de análisis</strong>, se busca
         ofrecer una herramienta práctica y estructurada que permita por un lado, identificar brechas
         en políticas, procesos y prácticas de gestión que impacten la atracción, desarrollo y
         retención del capital humano; además de evaluar la efectividad en la estructuración de
@@ -18,11 +18,14 @@
         de la situación actual de la compañía, es un ejercicio orientativo.</p>
     </div>
     <div class="pilares-analisis">
-      <h3>Pilares de análisis</h3>
+      <h3 class="primary-title">Pilares de análisis</h3>
       <ul>
         <li v-for="categoria in categorias" :key="categoria.id">
-          <strong>{{ categoria.name || categoria.title || categoria.nombre }}: {{ categoria.weight || categoria.peso || 20 }}%</strong>
-          <p>{{ categoria.description || categoria.descripcion || categoria.desc }}</p>
+          <div>
+            <strong>{{ categoria.name || categoria.title || categoria.nombre }}</strong>
+            <p>{{ categoria.description || categoria.descripcion || categoria.desc }}</p>
+          </div>
+          <div class="peso-categoria">{{ categoria.weight || categoria.peso || 20 }}%</div>
         </li>
         
         <!-- Fallback en caso de que no haya categorías cargadas -->
@@ -70,7 +73,6 @@ export default {
 
 .form-header h2 {
   font-size: 2rem;
-  color: #2c3e50;
   margin-bottom: 0.5rem;
   margin-top: 0;
   font-weight: bold;
@@ -92,7 +94,7 @@ export default {
 
 .pilares-analisis h3 {
   margin-bottom: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   text-align: center;
 }
 
@@ -100,23 +102,29 @@ export default {
   list-style: none;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
 }
 
 .pilares-analisis li {
   background: #f8f9fa;
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-radius: 8px;
   border-left: 4px solid #FFC107;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: flex;
 }
 
 .pilares-analisis strong {
   display: block;
   margin-bottom: 0.75rem;
-  color: #2c3e50;
   font-size: 1.1rem;
+}
+
+.pilares-analisis .peso-categoria {
+  font-size: 1.5rem;
+  color: #0067b1;
 }
 
 .pilares-analisis p {

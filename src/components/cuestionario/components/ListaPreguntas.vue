@@ -1,6 +1,6 @@
 <template>
   <div class="categorias-section">
-    <div v-for="categoria in categorias" :key="categoria.id" class="categoria-wrapper">
+    <div v-for="(categoria, index) in categorias" :key="categoria.id" class="categoria-wrapper">
       <div class="categoria-header">
         <h3 class="categoria-titulo">{{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
         <p class="categoria-descripcion">{{ categoria.description || categoria.descripcion || categoria.desc || 'Sin descripción' }}</p>
@@ -44,7 +44,7 @@
         </div>
         
         <div class="categoria-score">
-          <span>Puntaje del pilar:</span>
+          <span>Resultado pilar {{ index + 1 }}. {{ categoria.name }}:</span>
           <strong>{{ calcularPuntajeCategoria(categoria.id) }}</strong>
         </div>
       </div>
@@ -193,7 +193,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -205,7 +205,7 @@ export default {
 
 .categoria-descripcion {
   margin-bottom: 0.5rem;
-  color: #666;
+  color: #fff;
 }
 
 .categoria-meta {

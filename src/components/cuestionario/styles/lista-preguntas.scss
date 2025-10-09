@@ -8,11 +8,8 @@
 
 .categoria-header {
   padding: 1.5rem;
-  background: #f8f9fa;
+  background-color: #0067b1;
   border-bottom: 1px solid #e0e0e0;
-}
-
-.categoria-header {
   margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
@@ -21,16 +18,17 @@
 
 .categoria-titulo {
   font-size: 1.4rem;
-  color: #2c3e50;
+  color: #fff;
   margin: 0;
 }
 
 .categoria-descripcion {
-  color: #666;
+  color: #fff;
   line-height: 1.5;
   margin: 0;
   font-size: 1rem;
   text-align: left;
+  font-style: italic;
 }
 
 .categoria-score {
@@ -44,7 +42,9 @@
   font-size: 1.1rem;
 
   span {
-    color: #666;
+    color: #0067b1;
+    font-size: 1.3rem;
+    font-weight: 600;
   }
 
   strong {
@@ -70,13 +70,13 @@
 }
 
 .categoria-descripcion {
-  color: #666;
+  color: #fff;
   line-height: 1.5;
   margin: 0;
 }
 
 .preguntas-lista {
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem;
 }
 
 .pregunta-item {
@@ -321,6 +321,7 @@
     padding: 2px;
     margin-bottom: 3px;
     background-color: #f8f9fa;
+    color: #0067b1;
   }
 
   .pregunta-texto {
@@ -338,5 +339,9 @@
 
   .categoria-descripcion {
     font-size: 0.9rem;
+  }
+
+  .preguntas-lista {
+    padding: 0.2rem 0.5rem;
   }
 }
