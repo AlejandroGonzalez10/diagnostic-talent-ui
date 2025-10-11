@@ -53,6 +53,11 @@
     <!-- Puntaje total -->
     <div class="puntaje-total">
       <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
+      <button @click="generarPDF" class="btn-ver-resultado" :disabled="generandoPDF">
+        <span v-if="generandoPDF" class="loading-mini"></span>
+        <span v-else>📄</span>
+        {{ generandoPDF ? 'Generando PDF...' : 'Ver Resultado' }}
+      </button>
     </div>
   </div>
 </template>
@@ -88,7 +93,8 @@ export default {
   emits: ['update:respuestas', 'respuestas-cambio'],
   data() {
     return {
-      respuestasLocales: {}
+      respuestasLocales: {},
+      generandoPDF: false
     }
   },
   watch: {
@@ -191,6 +197,23 @@ export default {
     emitirCambios() {
       this.$emit('update:respuestas', this.respuestasLocales)
       this.$emit('respuestas-cambio')
+    },
+    async generarPDF() {
+      this.generandoPDF = true
+      
+      try {
+        // Pequeña pausa para mostrar el estado de loading
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Usar window.print() para imprimir la página actual
+        window.print()
+        
+      } catch (error) {
+        console.error('Error al generar PDF:', error)
+        alert('Error al generar el PDF. Intenta nuevamente.')
+      } finally {
+        this.generandoPDF = false
+      }
     }
   }
 }
@@ -357,6 +380,104 @@ input[type="radio"]:checked {
   text-align: right;
   font-size: 1.2rem;
   color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-ver-resultado {
+  background: #0067b1;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-ver-resultado:hover:not(:disabled) {
+  background: #005a9e;
+  transform: translateY(-1px);
+}
+
+.btn-ver-resultado:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-mini {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para impresión */
+@media print {
+  .btn-ver-resultado {
+    display: none !important;
+  }
+  
+  .categoria-wrapper {
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+  
+  .pregunta-item {
+    page-break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  
+  .puntaje-total {
+    page-break-before: auto;
+    border-top: 2px solid #0067b1;
+    padding-top: 20px;
+    margin-top: 30px;
+  }
+  
+  .categoria-header {
+    background: #0067b1 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .valor-respuesta {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+}
+
+/* Responsive para el puntaje total */
+@media (max-width: 768px) {
+  .puntaje-total {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .btn-ver-resultado {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .text-center {

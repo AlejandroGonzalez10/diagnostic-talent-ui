@@ -42,13 +42,13 @@
 
 .codigo-input:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  border-color: #0067B1;
+  box-shadow: 0 0 0 3px rgba(0, 103, 177, 0.2);
 }
 
 .codigo-button {
   padding: 0 2rem;
-  background: #4CAF50;
+  background: #0067B1;
   color: white;
   border: none;
   border-radius: 8px;
@@ -58,7 +58,7 @@
 }
 
 .codigo-button:hover {
-  background: #45a049;
+  background: #005a9e;
   transform: translateY(-1px);
 }
 
