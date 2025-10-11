@@ -5,8 +5,18 @@
 </template>
 
 <script>
+import { useSessionManager } from '@/composables/useSessionManager'
+
 export default {
-  name: 'App'
+  name: 'App',
+  setup() {
+    // Inicializar el gestor de sesión para toda la aplicación
+    const sessionManager = useSessionManager()
+    
+    return {
+      ...sessionManager
+    }
+  }
 }
 </script>
 

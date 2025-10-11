@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCuestionario } from '@/composables/useCuestionario'
+import { useReportes } from '@/composables/useReportes'
 
 // Importar componentes de páginas
 import Cuestionario from '@/components/cuestionario/Cuestionario.vue'
@@ -53,28 +54,54 @@ const router = createRouter({
 
 // Guard de navegación para proteger rutas
 router.beforeEach((to, from, next) => {
-  const { isAuthenticated, cargarDatosGuardados } = useCuestionario()
+  const { isAuthenticated: isCuestionarioAuth, cargarDatosGuardados } = useCuestionario()
+  const { isReportAuthenticated, cargarDatosReportes } = useReportes()
   
   // Cargar datos guardados antes de verificar autenticación
   cargarDatosGuardados()
+  cargarDatosReportes()
+  
+  console.log('🔍 Router Guard - Ruta:', to.path)
+  console.log('🔍 requiresAuth:', to.meta.requiresAuth)
+  console.log('🔍 isReportAuthenticated:', isReportAuthenticated.value)
+  console.log('🔍 isCuestionarioAuth:', isCuestionarioAuth.value)
   
   // Actualizar título de la página solo si existe en meta
   if (to.meta.title) {
     document.title = to.meta.title
   }
   
-  // Si la ruta requiere autenticación y no está autenticado
-  if (to.meta.requiresAuth && !isAuthenticated.value) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-    return
+  // Si la ruta requiere autenticación
+  if (to.meta.requiresAuth) {
+    // Para reportes, verificar autenticación de reportes
+    if (to.name === 'Reportes' && !isReportAuthenticated.value) {
+      console.log('❌ Acceso denegado a reportes - no autenticado')
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
+    // Para otras rutas que requieren auth, usar el sistema de cuestionario
+    else if (to.name !== 'Reportes' && !isCuestionarioAuth.value) {
+      console.log('❌ Acceso denegado - no autenticado')
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
   }
   
-  // Si está autenticado y trata de acceder al login, redirigir a reportes
-  if (to.meta.hideForAuthenticated && isAuthenticated.value) {
-    next({ name: 'Reportes' })
-    return
+  // Si está autenticado y trata de acceder al login, redirigir según el tipo de auth
+  if (to.meta.hideForAuthenticated) {
+    if (isReportAuthenticated.value) {
+      console.log('✅ Redirigiendo a reportes - ya autenticado')
+      next({ name: 'Reportes' })
+      return
+    }
+    else if (isCuestionarioAuth.value) {
+      console.log('✅ Redirigiendo a cuestionario - ya autenticado')
+      next({ name: 'Cuestionario' })
+      return
+    }
   }
   
+  console.log('✅ Permitiendo acceso a:', to.path)
   next()
 })
 

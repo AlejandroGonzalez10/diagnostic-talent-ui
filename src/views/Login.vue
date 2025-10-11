@@ -6,7 +6,7 @@
 
 <script>
 import { useRouter } from 'vue-router'
-import { useCuestionario } from '@/composables/useCuestionario'
+import { useReportes } from '@/composables/useReportes'
 import Login from '@/components/reportes/components/Login.vue'
 
 export default {
@@ -16,14 +16,22 @@ export default {
   },
   setup() {
     const router = useRouter()
-    const { autenticar } = useCuestionario()
+    const { autenticarReportes } = useReportes()
 
     const handleLoginExitoso = (respuesta) => {
-      // Guardar la autenticación en el composable
-      autenticar(respuesta)
+      console.log('🔄 Login exitoso recibido en LoginView:', respuesta)
       
-      // Redirigir a reportes
-      router.push('/reportes')
+      // Usar el composable específico de reportes
+      const autenticado = autenticarReportes(respuesta)
+      console.log('🔄 Resultado de autenticarReportes:', autenticado)
+      
+      if (autenticado) {
+        console.log('✅ Redirigiendo a reportes...')
+        // Redirigir a reportes
+        router.push('/reportes')
+      } else {
+        console.error('❌ No se pudo autenticar, no se redirige')
+      }
     }
 
     return {

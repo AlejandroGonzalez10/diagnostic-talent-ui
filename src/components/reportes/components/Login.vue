@@ -130,10 +130,12 @@ export default {
           password: formData.value.password
         })
 
-        // Login exitoso - la respuesta debe contener token y adminUser
-        if (respuesta.token && respuesta.adminUser) {
+        // Login exitoso - la respuesta debe contener token y usuario
+        if (respuesta.token && (respuesta.adminUser || respuesta.user)) {
+          console.log('✅ Login exitoso:', respuesta)
           emit('login-exitoso', respuesta)
         } else {
+          console.error('❌ Respuesta inválida:', respuesta)
           errorGeneral.value = 'Respuesta inválida del servidor'
         }
 

@@ -17,27 +17,50 @@ class HttpClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
-    // Obtener token del localStorage y verificar su validez
-    const token = localStorage.getItem('authToken')
-    const tokenTimestamp = localStorage.getItem('authTokenTimestamp')
+    // Obtener tokens del localStorage y verificar su validez
+    const reportToken = localStorage.getItem('reportToken')
+    const reportTokenTimestamp = localStorage.getItem('reportTokenTimestamp')
+    const cuestionarioToken = localStorage.getItem('authToken')
+    const cuestionarioTokenTimestamp = localStorage.getItem('authTokenTimestamp')
+    
     let authHeaders = {}
     
-    if (token && tokenTimestamp) {
-      // Verificar si el token ha expirado (2 horas = 7200000 ms)
+    // Verificar token de reportes (20 horas) - tiene prioridad
+    if (reportToken && reportTokenTimestamp) {
       const tiempoActual = Date.now()
-      const tiempoGuardado = parseInt(tokenTimestamp)
+      const tiempoGuardado = parseInt(reportTokenTimestamp)
+      const veinteHorasEnMs = 20 * 60 * 60 * 1000 // 20 horas en milisegundos
+      
+      if (tiempoActual - tiempoGuardado < veinteHorasEnMs) {
+        // Token de reportes aún válido
+        authHeaders = { 'Authorization': `Bearer ${reportToken}` }
+      } else {
+        // Token de reportes expirado, limpiar datos y redirigir
+        console.warn('🕒 Token de reportes expirado (20 horas), redirigiendo al login...')
+        localStorage.removeItem('reportToken')
+        localStorage.removeItem('reportUser')
+        localStorage.removeItem('reportTokenTimestamp')
+        // Redirigir específicamente al login
+        window.location.href = '/login'
+        return
+      }
+    }
+    // Si no hay token de reportes, verificar token de cuestionario (2 horas)
+    else if (cuestionarioToken && cuestionarioTokenTimestamp) {
+      const tiempoActual = Date.now()
+      const tiempoGuardado = parseInt(cuestionarioTokenTimestamp)
       const dosHorasEnMs = 2 * 60 * 60 * 1000 // 2 horas en milisegundos
       
       if (tiempoActual - tiempoGuardado < dosHorasEnMs) {
-        // Token aún válido
-        authHeaders = { 'Authorization': `Bearer ${token}` }
+        // Token de cuestionario aún válido
+        authHeaders = { 'Authorization': `Bearer ${cuestionarioToken}` }
       } else {
-        // Token expirado, limpiar datos
-        console.warn('🕒 Token expirado (2 horas), limpiando autenticación...')
+        // Token de cuestionario expirado, limpiar datos
+        console.warn('🕒 Token de cuestionario expirado (2 horas), limpiando autenticación...')
         localStorage.removeItem('authToken')
         localStorage.removeItem('authUser')
         localStorage.removeItem('authTokenTimestamp')
-        localStorage.removeItem('generalDataId')
+        // Para cuestionario, solo recargar la página
         window.location.reload()
         return
       }
@@ -60,15 +83,21 @@ class HttpClient {
         const errorText = await response.text()
         console.error('🌐 HTTP: Error del servidor:', errorText)
         
-        // Si es error 403 y menciona token, limpiar autenticación
+        // Si es error 403 y menciona token, limpiar autenticación y redirigir al login
         if (response.status === 403 && errorText.includes('token')) {
-          console.warn('🔐 Token inválido o expirado, limpiando autenticación...')
+          console.warn('🔐 Token inválido o expirado, redirigiendo al login...')
+          
+          // Limpiar ambos tipos de tokens por seguridad
+          localStorage.removeItem('reportToken')
+          localStorage.removeItem('reportUser')
+          localStorage.removeItem('reportTokenTimestamp')
           localStorage.removeItem('authToken')
           localStorage.removeItem('authUser')
           localStorage.removeItem('authTokenTimestamp')
           localStorage.removeItem('generalDataId')
-          // Recargar la página para forzar re-autenticación
-          window.location.reload()
+          
+          // Redirigir al login
+          window.location.href = '/login'
           return
         }
         

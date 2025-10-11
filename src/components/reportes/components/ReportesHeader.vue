@@ -10,7 +10,7 @@
       
       <div class="header-right">
         <div class="header-actions">
-          <button @click="cerrarSesion" class="btn-logout" title="Cerrar Sesión">
+          <button @click="cerrarSesionCompleta" class="btn-logout" title="Cerrar Sesión">
             🚪 Cerrar Sesión
           </button>
         </div>
@@ -20,16 +20,21 @@
 </template>
 
 <script>
+import { useSessionManager } from '@/composables/useSessionManager'
+
 export default {
   name: 'ReportesHeader',
   emits: ['cerrar-sesion'],
   setup(props, { emit }) {
-    const cerrarSesion = () => {
+    const { cerrarSesionManual } = useSessionManager()
+    
+    const cerrarSesionCompleta = () => {
+      cerrarSesionManual()
       emit('cerrar-sesion')
     }
 
     return {
-      cerrarSesion
+      cerrarSesionCompleta
     }
   }
 }
