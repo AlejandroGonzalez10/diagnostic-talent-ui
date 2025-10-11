@@ -61,11 +61,6 @@ router.beforeEach((to, from, next) => {
   cargarDatosGuardados()
   cargarDatosReportes()
   
-  console.log('🔍 Router Guard - Ruta:', to.path)
-  console.log('🔍 requiresAuth:', to.meta.requiresAuth)
-  console.log('🔍 isReportAuthenticated:', isReportAuthenticated.value)
-  console.log('🔍 isCuestionarioAuth:', isCuestionarioAuth.value)
-  
   // Actualizar título de la página solo si existe en meta
   if (to.meta.title) {
     document.title = to.meta.title
@@ -75,13 +70,11 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     // Para reportes, verificar autenticación de reportes
     if (to.name === 'Reportes' && !isReportAuthenticated.value) {
-      console.log('❌ Acceso denegado a reportes - no autenticado')
       next({ name: 'Login', query: { redirect: to.fullPath } })
       return
     }
     // Para otras rutas que requieren auth, usar el sistema de cuestionario
     else if (to.name !== 'Reportes' && !isCuestionarioAuth.value) {
-      console.log('❌ Acceso denegado - no autenticado')
       next({ name: 'Login', query: { redirect: to.fullPath } })
       return
     }
@@ -90,18 +83,15 @@ router.beforeEach((to, from, next) => {
   // Si está autenticado y trata de acceder al login, redirigir según el tipo de auth
   if (to.meta.hideForAuthenticated) {
     if (isReportAuthenticated.value) {
-      console.log('✅ Redirigiendo a reportes - ya autenticado')
       next({ name: 'Reportes' })
       return
     }
     else if (isCuestionarioAuth.value) {
-      console.log('✅ Redirigiendo a cuestionario - ya autenticado')
       next({ name: 'Cuestionario' })
       return
     }
   }
   
-  console.log('✅ Permitiendo acceso a:', to.path)
   next()
 })
 

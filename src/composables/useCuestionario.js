@@ -6,7 +6,13 @@ export function useCuestionario() {
   const preguntas = ref([])
   const categorias = ref([])
   const opciones = ref([])
-  const preguntasPorCategoria = ref({})
+  const preguntasPorCategoria = computed(() => {
+    const resultado = {}
+    categorias.value.forEach(categoria => {
+      resultado[categoria.id] = preguntas.value.filter(p => p.categoryId === categoria.id)
+    })
+    return resultado
+  })
   const respuestas = ref({})
   const isLoading = ref(false)
   const error = ref(null)
@@ -43,7 +49,6 @@ export function useCuestionario() {
         }
       } else {
         // Token expirado, limpiar datos
-        console.warn('🕒 Token expirado (2 horas), limpiando autenticación...')
         cerrarSesion()
       }
     }
@@ -65,10 +70,8 @@ export function useCuestionario() {
       localStorage.setItem('authToken', authData.token)
       localStorage.setItem('authUser', JSON.stringify(userData))
       localStorage.setItem('authTokenTimestamp', tiempoActual.toString())
-      
-      console.log('🔐 Token guardado con expiración de 2 horas')
     } else {
-      console.error('❌ Datos de autenticación inválidos:', authData)
+      // Datos de autenticación inválidos
     }
   }
 
@@ -257,8 +260,6 @@ export function useCuestionario() {
           
           if (idRespuesta) {
             sessionStorage.setItem(claveRegistro, idRespuesta.toString())
-          } else {
-            console.warn('⚠️ No se pudo extraer el ID de la respuesta del servidor')
           }
         } catch (error) {
           console.error('❌ Error al enviar respuesta:', error)
@@ -325,62 +326,24 @@ export function useCuestionario() {
       // Usar sessionStorage con clave que incluya general_data_id para que sea única por formulario
       const claveRegistro = `respuesta_${generalDataId.value}_${pregunta.categoryId}_${preguntaId}`
       const registroId = sessionStorage.getItem(claveRegistro)
-      
-      // Mostrar todo el contenido del sessionStorage para debugging
-      console.log('🗄️ Contenido actual de sessionStorage:', {
-        totalItems: sessionStorage.length,
-        items: Object.keys(sessionStorage).reduce((acc, key) => {
-          acc[key] = sessionStorage.getItem(key)
-          return acc
-        }, {})
-      })
-      
-      console.log('🔍 Verificando registro existente:', { 
-        claveRegistro, 
-        registroId, 
-        generalDataId: generalDataId.value,
-        categoriaId: pregunta.categoryId, 
-        preguntaId 
-      })
-      
       if (registroId) {
         // Ya existe un registro, actualizar usando el ID guardado
-        console.log('🔄 Actualizando respuesta existente:', { 
-          preguntaId, 
-          categoriaId: pregunta.categoryId, 
-          respuesta, 
-          registroId 
-        })
-        console.log('📤 Datos que se envían para actualizar:', datosRespuesta)
         datosRespuesta.id = parseInt(registroId)
         
         try {
-          const resultadoUpdate = await cuestionarioApi.actualizarRespuesta(datosRespuesta)
-          console.log('✅ Respuesta actualizada correctamente:', resultadoUpdate)
+          await cuestionarioApi.actualizarRespuesta(datosRespuesta)
         } catch (updateError) {
-          console.error('❌ Error al actualizar, intentando crear nueva:', updateError)
           // Si falla el PUT, intentar POST
           const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          console.log('📝 Resultado del POST de fallback:', resultado)
           if (resultado && resultado.id) {
             sessionStorage.setItem(claveRegistro, resultado.id.toString())
-            console.log('💾 Nuevo ID guardado en sessionStorage:', resultado.id)
           }
         }
       } else {
         // Primera vez enviando esta respuesta para esta combinación
-        console.log('✅ Enviando nueva respuesta:', { 
-          preguntaId, 
-          categoriaId: pregunta.categoryId, 
-          respuesta,
-          generalDataId: generalDataId.value
-        })
         
         try {
           const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          console.log('📝 Resultado completo del POST:', resultado)
-          console.log('📝 Tipo de resultado:', typeof resultado)
-          console.log('📝 Propiedades del resultado:', Object.keys(resultado || {}))
           
           // Intentar varias formas de obtener el ID
           let idRespuesta = null
@@ -390,23 +353,10 @@ export function useCuestionario() {
             if (!idRespuesta && resultado.data) {
               idRespuesta = resultado.data.id || resultado.data.ID || resultado.data.answer_id
             }
-            
-            console.log('🔍 ID encontrado:', idRespuesta)
           }
           
           if (idRespuesta) {
             sessionStorage.setItem(claveRegistro, idRespuesta.toString())
-            console.log('💾 ID guardado en sessionStorage:', { 
-              clave: claveRegistro, 
-              id: idRespuesta 
-            })
-            
-            // Verificar que se guardó correctamente
-            const verificacion = sessionStorage.getItem(claveRegistro)
-            console.log('✔️ Verificación de guardado:', verificacion)
-          } else {
-            console.warn('⚠️ No se pudo extraer el ID de la respuesta del servidor')
-            console.warn('⚠️ Resultado recibido:', resultado)
           }
         } catch (error) {
           console.error('❌ Error al enviar respuesta:', error)

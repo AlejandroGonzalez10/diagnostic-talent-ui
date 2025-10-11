@@ -23,10 +23,8 @@ export function useReportes() {
         reportToken.value = tokenGuardado
         reportUser.value = JSON.parse(usuarioGuardado)
         isReportAuthenticated.value = true
-        console.log('🔐 Sesión de reportes restaurada desde localStorage')
       } else {
         // Token expirado, limpiar datos
-        console.warn('🕒 Token de reportes expirado (20 horas), limpiando autenticación...')
         cerrarSesionReportes()
       }
     }
@@ -34,15 +32,6 @@ export function useReportes() {
 
   // 🔐 Función de autenticación para reportes
   const autenticarReportes = (authData) => {
-    console.log('🔐 Intentando autenticar reportes:', authData)
-    console.log('🔐 authData.token:', authData.token)
-    console.log('🔐 authData.adminUser:', authData.adminUser)
-    console.log('🔐 authData.user:', authData.user)
-    
-    // Buscar userData en diferentes campos posibles
-    const userData = authData.adminUser || authData.user || authData.usuario
-    console.log('🔐 userData encontrado:', userData)
-    
     if (authData.token) {
       // Si hay token, intentar autenticar aunque no haya userData perfecta
       const userData = authData.adminUser || authData.user || authData.usuario || { id: 1, name: 'Usuario Test' }
@@ -58,12 +47,8 @@ export function useReportes() {
       localStorage.setItem('reportUser', JSON.stringify(userData))
       localStorage.setItem('reportTokenTimestamp', tiempoActual.toString())
       
-      console.log('🔐 Token de reportes guardado con expiración de 20 horas')
-      console.log('✅ Autenticación exitosa, usuario:', userData)
       return true
     } else {
-      console.error('❌ No se encontró token en la respuesta de autenticación')
-      console.error('❌ authData completo:', authData)
       return false
     }
   }
@@ -78,8 +63,6 @@ export function useReportes() {
     localStorage.removeItem('reportToken')
     localStorage.removeItem('reportUser')
     localStorage.removeItem('reportTokenTimestamp')
-    
-    console.log('👋 Sesión de reportes cerrada')
   }
 
   // 🔍 Función para verificar si la sesión sigue válida
@@ -96,7 +79,6 @@ export function useReportes() {
     
     if (tiempoActual - tiempoGuardado >= veinteHorasEnMs) {
       // Sesión expirada
-      console.warn('🕒 Sesión de reportes expirada, cerrando automáticamente...')
       cerrarSesionReportes()
       return false
     }

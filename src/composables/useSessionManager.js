@@ -27,13 +27,11 @@ export function useSessionManager() {
     // Mostrar notificación cuando queden menos de 2 horas
     const dosHorasEnMs = 2 * 60 * 60 * 1000
     if (tiempoRestante <= dosHorasEnMs && tiempoRestante > 0 && !notificacionMostrada.value) {
-      console.warn(`⚠️ La sesión de reportes expirará en ${Math.floor(tiempoRestante / (60 * 60 * 1000))} horas y ${Math.floor((tiempoRestante % (60 * 60 * 1000)) / (60 * 1000))} minutos`)
       notificacionMostrada.value = true
     }
     
     if (tiempoTranscurrido >= veinteHorasEnMs) {
       // Sesión de reportes expirada
-      console.warn('🕒 Sesión de reportes expirada (20 horas), cerrando sesión automáticamente...')
       cerrarSesionCompleta()
       return false
     }
@@ -65,7 +63,6 @@ export function useSessionManager() {
 
   // Función para cerrar sesión manualmente
   const cerrarSesionManual = () => {
-    console.log('👋 Cerrando sesión de reportes manualmente...')
     cerrarSesionCompleta()
   }
 
@@ -110,8 +107,6 @@ export function useSessionManager() {
     intervalId.value = setInterval(() => {
       verificarSesion()
     }, intervaloMs)
-    
-    console.log(`🔄 Monitoreo de sesión de reportes iniciado - verificando cada ${intervaloMinutos} minutos`)
   }
 
   // Detener el monitoreo
@@ -119,7 +114,6 @@ export function useSessionManager() {
     if (intervalId.value) {
       clearInterval(intervalId.value)
       intervalId.value = null
-      console.log('⏹️ Monitoreo de sesión de reportes detenido')
     }
   }
 

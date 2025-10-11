@@ -36,7 +36,6 @@ class HttpClient {
         authHeaders = { 'Authorization': `Bearer ${reportToken}` }
       } else {
         // Token de reportes expirado, limpiar datos y redirigir
-        console.warn('🕒 Token de reportes expirado (20 horas), redirigiendo al login...')
         localStorage.removeItem('reportToken')
         localStorage.removeItem('reportUser')
         localStorage.removeItem('reportTokenTimestamp')
@@ -56,7 +55,6 @@ class HttpClient {
         authHeaders = { 'Authorization': `Bearer ${cuestionarioToken}` }
       } else {
         // Token de cuestionario expirado, limpiar datos
-        console.warn('🕒 Token de cuestionario expirado (2 horas), limpiando autenticación...')
         localStorage.removeItem('authToken')
         localStorage.removeItem('authUser')
         localStorage.removeItem('authTokenTimestamp')
@@ -85,7 +83,6 @@ class HttpClient {
         
         // Si es error 403 y menciona token, limpiar autenticación y redirigir al login
         if (response.status === 403 && errorText.includes('token')) {
-          console.warn('🔐 Token inválido o expirado, redirigiendo al login...')
           
           // Limpiar ambos tipos de tokens por seguridad
           localStorage.removeItem('reportToken')

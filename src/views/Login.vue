@@ -19,18 +19,12 @@ export default {
     const { autenticarReportes } = useReportes()
 
     const handleLoginExitoso = (respuesta) => {
-      console.log('🔄 Login exitoso recibido en LoginView:', respuesta)
-      
       // Usar el composable específico de reportes
       const autenticado = autenticarReportes(respuesta)
-      console.log('🔄 Resultado de autenticarReportes:', autenticado)
       
       if (autenticado) {
-        console.log('✅ Redirigiendo a reportes...')
         // Redirigir a reportes
         router.push('/reportes')
-      } else {
-        console.error('❌ No se pudo autenticar, no se redirige')
       }
     }
 

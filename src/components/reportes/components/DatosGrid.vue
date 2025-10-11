@@ -300,7 +300,6 @@ export default {
         await new Promise(resolve => setTimeout(resolve, 2000))
         
         // Aquí se implementaría la descarga real del PDF
-        console.log('Descargando PDF para:', registro.empresa)
         
         // Simulación de descarga
         const blob = new Blob(['PDF content for ' + registro.empresa], { type: 'application/pdf' })
