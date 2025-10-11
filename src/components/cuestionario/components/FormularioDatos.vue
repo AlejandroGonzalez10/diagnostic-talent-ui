@@ -114,6 +114,7 @@
 <script>
 import { ref } from 'vue'
 import { useValidacion } from '@/composables/useValidacion'
+import { useCuestionario } from '@/composables/useCuestionario'
 import { cuestionarioApi } from '@/services/api'
 
 export default {
@@ -135,6 +136,8 @@ export default {
   emits: ['update:datos', 'validacion-cambio', 'datos-enviados'],
   setup(props, { emit }) {
     const { validarEmail } = useValidacion()
+    const { generalDataId, setGeneralDataId } = useCuestionario()
+    
     const datosLocales = ref({ ...props.datosIniciales })
     const errores = ref({
       entidad: false,
@@ -147,7 +150,6 @@ export default {
     })
     const enviandoDatos = ref(false)
     const registroCreado = ref(false)
-    const generalDataId = ref(null)
 
     // Crear registro inicial cuando se monta el componente
     const crearRegistroInicial = async () => {
@@ -156,7 +158,8 @@ export default {
       try {
         const respuesta = await cuestionarioApi.crearRegistroInicial()
         
-        generalDataId.value = respuesta.id
+        // Usar la función global para establecer el ID
+        setGeneralDataId(respuesta.id)
         registroCreado.value = true
         emit('datos-enviados', respuesta.id)
       } catch (error) {

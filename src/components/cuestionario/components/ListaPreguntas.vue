@@ -133,12 +133,22 @@ export default {
       }
     },
     getValorClass(respuesta) {
-      const puntos = this.calcularPuntajePregunta(respuesta, this.opciones)
+      // Obtener la opción seleccionada
+      const opcionSeleccionada = this.opciones.find(opt => opt.value === respuesta)
       
-      if (puntos >= 5) return 'valor-alto'
-      if (puntos >= 3) return 'valor-medio'
-      if (puntos >= 1) return 'valor-bajo'
-      return ''
+      if (!opcionSeleccionada) return ''
+      
+      // Aplicar colores según el tipo de respuesta
+      switch(opcionSeleccionada.option.toLowerCase()) {
+        case 'si':
+        case 'sí':
+          return 'valor-si'
+        case 'no':
+          return 'valor-no'
+        case 'en parte':
+        default:
+          return 'valor-otra'
+      }
     },
     calcularPuntajeTotal() {
       if (this.categorias.length === 0) return '0.00'
@@ -308,6 +318,25 @@ input[type="radio"]:checked {
   font-weight: 500;
 }
 
+.valor-si {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+.valor-no {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+.valor-otra {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+/* Mantener estilos originales como fallback */
 .valor-alto {
   background-color: #d4edda;
   color: #155724;

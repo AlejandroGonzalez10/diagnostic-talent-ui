@@ -17,9 +17,31 @@ class HttpClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
-    // Obtener token del localStorage
+    // Obtener token del localStorage y verificar su validez
     const token = localStorage.getItem('authToken')
-    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {}
+    const tokenTimestamp = localStorage.getItem('authTokenTimestamp')
+    let authHeaders = {}
+    
+    if (token && tokenTimestamp) {
+      // Verificar si el token ha expirado (2 horas = 7200000 ms)
+      const tiempoActual = Date.now()
+      const tiempoGuardado = parseInt(tokenTimestamp)
+      const dosHorasEnMs = 2 * 60 * 60 * 1000 // 2 horas en milisegundos
+      
+      if (tiempoActual - tiempoGuardado < dosHorasEnMs) {
+        // Token aún válido
+        authHeaders = { 'Authorization': `Bearer ${token}` }
+      } else {
+        // Token expirado, limpiar datos
+        console.warn('🕒 Token expirado (2 horas), limpiando autenticación...')
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('authUser')
+        localStorage.removeItem('authTokenTimestamp')
+        localStorage.removeItem('generalDataId')
+        window.location.reload()
+        return
+      }
+    }
 
     try {
       const response = await fetch(`${this.baseURL}${url}`, {
@@ -43,6 +65,8 @@ class HttpClient {
           console.warn('🔐 Token inválido o expirado, limpiando autenticación...')
           localStorage.removeItem('authToken')
           localStorage.removeItem('authUser')
+          localStorage.removeItem('authTokenTimestamp')
+          localStorage.removeItem('generalDataId')
           // Recargar la página para forzar re-autenticación
           window.location.reload()
           return
@@ -91,6 +115,7 @@ const httpClient = new HttpClient(API_CONFIG)
 
 const ENDPOINTS = {
   AUTH: '/users/auth',
+  LOGIN: '/users/admin/auth',
   CATEGORIES: '/quiestionaire/categories',
   QUESTIONS: '/quiestionaire/questions',
   OPTIONS: '/quiestionaire/options',
@@ -183,6 +208,27 @@ export const authApi = {
     } catch (error) {
       console.error('🔐 AUTH: Error en autenticación:', error)
       throw new Error('Código de acceso inválido')
+    }
+  },
+
+  async login(credentials) {
+    try {
+      const response = await httpClient.post(ENDPOINTS.LOGIN, {
+        email: credentials.email,
+        password: credentials.password
+      })
+      return response
+    } catch (error) {
+      console.error('🔐 LOGIN: Error en login:', error)
+      
+      // Manejar diferentes tipos de errores
+      if (error.message && error.message.includes('401')) {
+        throw new Error('Email o contraseña incorrectos')
+      } else if (error.message && error.message.includes('403')) {
+        throw new Error('Acceso denegado')
+      } else {
+        throw new Error('Error de conexión. Intenta nuevamente.')
+      }
     }
   }
 }

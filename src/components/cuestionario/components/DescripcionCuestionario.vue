@@ -76,6 +76,7 @@ export default {
   margin-bottom: 0.5rem;
   margin-top: 0;
   font-weight: bold;
+  text-align: center;
 }
 
 .descripcion-diagnostico {

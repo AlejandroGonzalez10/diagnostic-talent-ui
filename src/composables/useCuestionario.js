@@ -22,25 +22,51 @@ export function useCuestionario() {
     // Solo cargar datos de autenticación, no datos de negocio
     const tokenGuardado = localStorage.getItem('authToken')
     const usuarioGuardado = localStorage.getItem('authUser')
+    const tokenTimestamp = localStorage.getItem('authTokenTimestamp')
+    const generalDataIdGuardado = localStorage.getItem('generalDataId')
     
-    if (tokenGuardado && usuarioGuardado) {
-      token.value = tokenGuardado
-      usuario.value = JSON.parse(usuarioGuardado)
-      isAuthenticated.value = true
+    if (tokenGuardado && usuarioGuardado && tokenTimestamp) {
+      // Verificar si el token ha expirado (2 horas = 7200000 ms)
+      const tiempoActual = Date.now()
+      const tiempoGuardado = parseInt(tokenTimestamp)
+      const dosHorasEnMs = 2 * 60 * 60 * 1000 // 2 horas en milisegundos
+      
+      if (tiempoActual - tiempoGuardado < dosHorasEnMs) {
+        // Token aún válido
+        token.value = tokenGuardado
+        usuario.value = JSON.parse(usuarioGuardado)
+        isAuthenticated.value = true
+        
+        // Cargar generalDataId si existe
+        if (generalDataIdGuardado) {
+          generalDataId.value = parseInt(generalDataIdGuardado)
+        }
+      } else {
+        // Token expirado, limpiar datos
+        console.warn('🕒 Token expirado (2 horas), limpiando autenticación...')
+        cerrarSesion()
+      }
     }
   }
 
   // 🔐 Función de autenticación
   const autenticar = (authData) => {
-    if (authData.token && authData.user) {
+    // Verificar si tenemos token y adminUser (nueva estructura) o token y user (estructura anterior)
+    const userData = authData.adminUser || authData.user
+    
+    if (authData.token && userData) {
       // Guardar en variables reactivas
       token.value = authData.token
-      usuario.value = authData.user
+      usuario.value = userData
       isAuthenticated.value = true
       
-      // Guardar en localStorage para persistencia
+      // Guardar en localStorage para persistencia con timestamp
+      const tiempoActual = Date.now()
       localStorage.setItem('authToken', authData.token)
-      localStorage.setItem('authUser', JSON.stringify(authData.user))
+      localStorage.setItem('authUser', JSON.stringify(userData))
+      localStorage.setItem('authTokenTimestamp', tiempoActual.toString())
+      
+      console.log('🔐 Token guardado con expiración de 2 horas')
     } else {
       console.error('❌ Datos de autenticación inválidos:', authData)
     }
@@ -56,6 +82,8 @@ export function useCuestionario() {
     // Limpiar localStorage
     localStorage.removeItem('authToken')
     localStorage.removeItem('authUser')
+    localStorage.removeItem('authTokenTimestamp')
+    localStorage.removeItem('generalDataId')
     
     // Limpiar sessionStorage de respuestas
     const keys = Object.keys(sessionStorage)
@@ -69,6 +97,12 @@ export function useCuestionario() {
   // 🆔 Función para establecer el ID de datos generales
   const setGeneralDataId = (id) => {
     generalDataId.value = id
+    // Persistir en localStorage para mantener entre recargas
+    if (id) {
+      localStorage.setItem('generalDataId', id.toString())
+    } else {
+      localStorage.removeItem('generalDataId')
+    }
   }
 
   const fetchCategorias = async () => {

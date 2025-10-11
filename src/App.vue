@@ -1,17 +1,12 @@
 <template>
   <div id="app">
-    <FormCuestionario />
+    <router-view />
   </div>
 </template>
 
 <script>
-import FormCuestionario from './components/cuestionario/Cuestionario.vue'
-
 export default {
-  name: 'App',
-  components: {
-    FormCuestionario
-  }
+  name: 'App'
 }
 </script>
 
@@ -32,9 +27,8 @@ body,html {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 .logo-container {
@@ -48,7 +42,7 @@ body,html {
 }
 
 .title-banner{
-  color: #f4f4f4;
+  color: #f4f4f4 !important;
   background-color: #0067B1;
   padding: 10px;
   border-radius: 8px;
