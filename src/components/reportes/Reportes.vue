@@ -1,25 +1,13 @@
 <template>
   <div class="reportes-container">
     <ReportesHeader 
-      :usuario="usuario" 
       @cerrar-sesion="cerrarSesion" 
     />
     
     <main class="reportes-main">
       <div class="reportes-content">
-        <section class="dashboard-section">
-          <div class="section-header">
-            <h2>Panel de Control</h2>
-            <p class="section-description">
-              Accede a todos los reportes y análisis del diagnóstico de talento.
-            </p>
-          </div>
-          
-          <ReportesDashboard />
-        </section>
-
-        <section class="quick-nav-section">
-          <ReportesQuickNav />
+        <section class="datos-section">
+          <DatosGrid />
         </section>
       </div>
     </main>
@@ -27,23 +15,20 @@
 </template>
 
 <script>
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCuestionario } from '@/composables/useCuestionario'
 import ReportesHeader from './components/ReportesHeader.vue'
-import ReportesDashboard from './components/ReportesDashboard.vue'
-import ReportesQuickNav from './components/ReportesQuickNav.vue'
+import DatosGrid from './components/DatosGrid.vue'
 
 export default {
   name: 'ReportesMain',
   components: {
     ReportesHeader,
-    ReportesDashboard,
-    ReportesQuickNav
+    DatosGrid
   },
   setup() {
     const router = useRouter()
-    const { usuario, cerrarSesion: cerrarSesionComposable } = useCuestionario()
+    const { cerrarSesion: cerrarSesionComposable } = useCuestionario()
 
     const cerrarSesion = () => {
       cerrarSesionComposable()
@@ -51,7 +36,6 @@ export default {
     }
 
     return {
-      usuario: computed(() => usuario.value),
       cerrarSesion
     }
   }
@@ -67,7 +51,7 @@ export default {
 }
 
 .reportes-main {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1rem 1rem 2rem 1rem;
 }
@@ -75,10 +59,9 @@ export default {
 .reportes-content {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
 }
 
-.dashboard-section {
+.datos-section {
   background: white;
   border-radius: 20px;
   padding: 2.5rem;
@@ -113,11 +96,7 @@ export default {
     padding: 1rem;
   }
   
-  .reportes-content {
-    gap: 2rem;
-  }
-  
-  .dashboard-section {
+  .datos-section {
     padding: 1.5rem;
     border-radius: 16px;
   }
@@ -136,7 +115,7 @@ export default {
     padding: 0.5rem;
   }
   
-  .dashboard-section {
+  .datos-section {
     padding: 1rem;
   }
   

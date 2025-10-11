@@ -17,7 +17,6 @@ const routes = [
     name: 'Cuestionario',
     component: Cuestionario,
     meta: {
-      title: 'Diagnóstico de Talento - Cuestionario',
       requiresAuth: false // El cuestionario tiene su propio sistema de código de acceso
     }
   },
@@ -26,7 +25,7 @@ const routes = [
     name: 'Login',
     component: LoginView,
     meta: {
-      title: 'Iniciar Sesión - Reportes',
+      title: 'Iniciar Sesión',
       requiresAuth: false,
       hideForAuthenticated: true // Ocultar si ya está autenticado
     }
@@ -36,7 +35,7 @@ const routes = [
     name: 'Reportes',
     component: Reportes,
     meta: {
-      title: 'Reportes - Diagnóstico de Talento',
+      title: 'Reporte',
       requiresAuth: true // Requiere autenticación con usuario/contraseña
     }
   },
@@ -59,8 +58,10 @@ router.beforeEach((to, from, next) => {
   // Cargar datos guardados antes de verificar autenticación
   cargarDatosGuardados()
   
-  // Actualizar título de la página
-  document.title = to.meta.title || 'Diagnóstico de Talento'
+  // Actualizar título de la página solo si existe en meta
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
   
   // Si la ruta requiere autenticación y no está autenticado
   if (to.meta.requiresAuth && !isAuthenticated.value) {
