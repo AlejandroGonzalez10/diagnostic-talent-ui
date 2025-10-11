@@ -64,8 +64,6 @@ export function useCuestionario() {
         sessionStorage.removeItem(key)
       }
     })
-    
-    console.log('🚪 Sesión cerrada y datos limpiados')
   }
 
   // 🆔 Función para establecer el ID de datos generales
@@ -190,69 +188,28 @@ export function useCuestionario() {
   // 🔧 Función auxiliar para enviar datos de respuesta (CON CONTROL DE DUPLICADOS)
   const enviarRespuestaDatos = async (datosRespuesta) => {
     try {
-      console.log('🔧 ENTRANDO a enviarRespuestaDatos:', datosRespuesta)
-      
       // Usar sessionStorage con clave que incluya general_data_id para que sea única por formulario
       const claveRegistro = `respuesta_${datosRespuesta.general_data_id}_${datosRespuesta.category_id}_${datosRespuesta.question_id}`
       const registroId = sessionStorage.getItem(claveRegistro)
       
-      // Mostrar todo el contenido del sessionStorage para debugging
-      console.log('🗄️ Contenido actual de sessionStorage:', {
-        totalItems: sessionStorage.length,
-        items: Object.keys(sessionStorage).reduce((acc, key) => {
-          acc[key] = sessionStorage.getItem(key)
-          return acc
-        }, {})
-      })
-      
-      console.log('🔍 Verificando registro existente:', { 
-        claveRegistro, 
-        registroId, 
-        generalDataId: datosRespuesta.general_data_id,
-        categoriaId: datosRespuesta.category_id, 
-        preguntaId: datosRespuesta.question_id
-      })
-      
       if (registroId) {
         // Ya existe un registro, actualizar usando el ID guardado
-        console.log('🔄 Actualizando respuesta existente:', { 
-          preguntaId: datosRespuesta.question_id, 
-          categoriaId: datosRespuesta.category_id, 
-          valor: datosRespuesta.value, 
-          registroId 
-        })
-        
-        // Agregar el ID al body de la petición
         datosRespuesta.id = parseInt(registroId)
-        console.log('📤 Datos completos que se envían para PUT (con ID en body):', datosRespuesta)
         
         try {
-          const resultadoUpdate = await cuestionarioApi.actualizarRespuesta(datosRespuesta)
-          console.log('✅ Respuesta actualizada correctamente:', resultadoUpdate)
+          await cuestionarioApi.actualizarRespuesta(datosRespuesta)
         } catch (updateError) {
           console.error('❌ Error al actualizar, intentando crear nueva:', updateError)
           // Si falla el PUT, intentar POST
           const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          console.log('📝 Resultado del POST de fallback:', resultado)
           if (resultado && resultado.id) {
             sessionStorage.setItem(claveRegistro, resultado.id.toString())
-            console.log('💾 Nuevo ID guardado en sessionStorage:', resultado.id)
           }
         }
       } else {
         // Primera vez enviando esta respuesta para esta combinación
-        console.log('✅ Enviando nueva respuesta:', { 
-          preguntaId: datosRespuesta.question_id, 
-          categoriaId: datosRespuesta.category_id, 
-          valor: datosRespuesta.value,
-          generalDataId: datosRespuesta.general_data_id
-        })
-        
         try {
           const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          console.log('📝 Resultado completo del POST:', resultado)
-          console.log('📝 Tipo de resultado:', typeof resultado)
-          console.log('📝 Propiedades del resultado:', Object.keys(resultado || {}))
           
           // Intentar varias formas de obtener el ID
           let idRespuesta = null
@@ -262,23 +219,12 @@ export function useCuestionario() {
             if (!idRespuesta && resultado.data) {
               idRespuesta = resultado.data.id || resultado.data.ID || resultado.data.answer_id
             }
-            
-            console.log('🔍 ID encontrado:', idRespuesta)
           }
           
           if (idRespuesta) {
             sessionStorage.setItem(claveRegistro, idRespuesta.toString())
-            console.log('💾 ID guardado en sessionStorage:', { 
-              clave: claveRegistro, 
-              id: idRespuesta 
-            })
-            
-            // Verificar que se guardó correctamente
-            const verificacion = sessionStorage.getItem(claveRegistro)
-            console.log('✔️ Verificación de guardado:', verificacion)
           } else {
             console.warn('⚠️ No se pudo extraer el ID de la respuesta del servidor')
-            console.warn('⚠️ Resultado recibido:', resultado)
           }
         } catch (error) {
           console.error('❌ Error al enviar respuesta:', error)
@@ -292,46 +238,24 @@ export function useCuestionario() {
 
   // 🚀 Función principal de envío automático de respuestas
   const enviarRespuestaAutomatica = async (preguntaId, respuesta) => {
-    console.log('🚀 INICIANDO enviarRespuestaAutomatica:', { 
-      preguntaId, 
-      respuesta, 
-      generalDataId: generalDataId.value 
-    })
-    
     if (!generalDataId.value) {
-      console.warn('❌ No hay generalDataId, cancelando envío')
       return
     }
 
     // Buscar la pregunta
     const pregunta = preguntas.value.find(p => p.id === parseInt(preguntaId))
-    console.log('🔍 Búsqueda de pregunta:', { 
-      preguntaId, 
-      preguntaIdInt: parseInt(preguntaId),
-      preguntaEncontrada: pregunta,
-      totalPreguntas: preguntas.value.length
-    })
     
     if (!pregunta) {
-      console.warn('❌ Pregunta no encontrada, cancelando envío')
       return
     }
 
     // Buscar la opción seleccionada
     const opcion = opciones.value.find(opt => opt.value === respuesta)
-    console.log('🔍 Búsqueda de opción:', { 
-      respuesta, 
-      opcionEncontrada: opcion,
-      totalOpciones: opciones.value.length,
-      opcionesDisponibles: opciones.value.map(o => ({ value: o.value, text: o.text }))
-    })
     
     if (!opcion) {
-      console.log('⚠️ Opción no encontrada directamente, buscando por conversión...')
       // Búsqueda alternativa por conversión de string
       const opcionPorString = opciones.value.find(opt => opt.value.toString() === respuesta.toString())
       if (opcionPorString) {
-        console.log('✅ Opción encontrada por conversión:', opcionPorString)
         const valorNumerico = Number(opcionPorString.value)
         
         if (!isNaN(valorNumerico)) {
@@ -342,21 +266,17 @@ export function useCuestionario() {
             value: valorNumerico
           }
           
-          console.log('📤 Enviando respuesta (ruta alternativa):', datosRespuesta)
           await enviarRespuestaDatos(datosRespuesta)
           return
         }
       }
       
-      console.warn('❌ No se pudo encontrar opción válida, cancelando')
       return
     }
 
-    console.log('✅ Opción encontrada directamente:', opcion)
     const valorNumerico = Number(opcion.value)
     
     if (isNaN(valorNumerico)) {
-      console.warn('❌ Valor no numérico, cancelando:', opcion.value)
       return
     }
 
@@ -465,22 +385,11 @@ export function useCuestionario() {
 
   // 💾 Función para guardar respuesta
   const guardarRespuesta = (preguntaId, respuesta) => {
-    console.log('💾 Guardando respuesta:', { 
-      preguntaId, 
-      respuesta, 
-      generalDataId: generalDataId.value,
-      tieneGeneralDataId: !!generalDataId.value
-    })
-    
     respuestas.value[preguntaId] = respuesta
     
     // Enviar automáticamente si tenemos general_data_id
     if (generalDataId.value) {
-      console.log('🚀 Llamando a enviarRespuestaAutomatica...')
       enviarRespuestaAutomatica(preguntaId, respuesta)
-    } else {
-      console.warn('⚠️ No se puede enviar respuesta: generalDataId no está definido')
-      console.warn('⚠️ Valor actual de generalDataId:', generalDataId.value)
     }
   }
 

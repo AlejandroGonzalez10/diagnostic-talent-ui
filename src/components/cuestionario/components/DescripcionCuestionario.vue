@@ -23,7 +23,7 @@
         <li v-for="categoria in categorias" :key="categoria.id">
           <div>
             <strong>{{ categoria.name || categoria.title || categoria.nombre }}</strong>
-            <p>{{ categoria.description || categoria.descripcion || categoria.desc }}</p>
+            <p>{{ categoria.short_description || categoria.descripcion || categoria.desc }}</p>
           </div>
           <div class="peso-categoria">{{ categoria.weight || categoria.peso || 20 }}%</div>
         </li>
