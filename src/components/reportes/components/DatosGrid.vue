@@ -46,7 +46,7 @@
     <!-- Información de resultados -->
     <div class="resultados-info">
       <p>
-        Mostrando {{ datosFiltrados.length }} de {{ datosRegistros.length }} registros
+        Mostrando {{ datosFiltrados.length }} registros de {{ totalItems }} totales
       </p>
     </div>
 
@@ -146,10 +146,73 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Paginación -->
+    <div v-if="!cargando && !error && totalItems > 0" class="paginacion-container">
+      <div class="paginacion">
+        <button 
+          @click="cambiarPagina(1)" 
+          :disabled="currentPage === 1"
+          class="btn-pagina"
+          title="Primera página"
+        >
+          ««
+        </button>
+        
+        <button 
+          @click="cambiarPagina(currentPage - 1)" 
+          :disabled="currentPage === 1"
+          class="btn-pagina"
+          title="Página anterior"
+        >
+          «
+        </button>
+        
+        <div class="paginas-numeros">
+          <button
+            v-for="pagina in paginasVisibles"
+            :key="pagina"
+            @click="cambiarPagina(pagina)"
+            :class="['btn-pagina', { 'activa': pagina === currentPage }]"
+          >
+            {{ pagina }}
+          </button>
+        </div>
+        
+        <button 
+          @click="cambiarPagina(currentPage + 1)" 
+          :disabled="currentPage === totalPages"
+          class="btn-pagina"
+          title="Página siguiente"
+        >
+          »
+        </button>
+        
+        <button 
+          @click="cambiarPagina(totalPages)" 
+          :disabled="currentPage === totalPages"
+          class="btn-pagina"
+          title="Última página"
+        >
+          »»
+        </button>
+      </div>
+      
+      <div class="info-paginacion">
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <select v-model="pageSize" @change="cambiarTamanoPagina" class="select-tamano">
+          <option :value="10">10 por página</option>
+          <option :value="25">25 por página</option>
+          <option :value="50">50 por página</option>
+          <option :value="100">100 por página</option>
+        </select>
+      </div>
+    </div>
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { reportesApi } from '@/services/api'
 
 export default {
   name: 'DatosGrid',
@@ -159,6 +222,12 @@ export default {
     const error = ref('')
     const descargando = ref(null)
     const datosRegistros = ref([])
+    
+    // Paginación
+    const currentPage = ref(1)
+    const pageSize = ref(10)
+    const totalItems = ref(0)
+    const totalPages = ref(0)
     
     // Filtros
     const filtros = ref({
@@ -171,50 +240,33 @@ export default {
     const ordenActual = ref('fecha')
     const direccionOrden = ref('desc')
 
-    // Datos de ejemplo (más adelante se conectará con la API real)
+    // Función para cargar datos desde el API
     const cargarDatos = async () => {
       cargando.value = true
       error.value = ''
       
       try {
-        // Simular carga de datos - aquí se haría la llamada real a la API
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        const response = await reportesApi.obtenerReportes(currentPage.value, pageSize.value)
         
-        datosRegistros.value = [
-          {
-            id: 1,
-            empresa: 'Tecnología Avanzada S.A.S',
-            nit: '900.123.456-7',
-            sector: 'Tecnología',
-            empleados: '50-100',
-            contacto: 'María García',
-            cargo: 'Gerente de Recursos Humanos',
-            email: 'maria.garcia@tecnoavanzada.com',
-            fecha: new Date('2024-01-15')
-          },
-          {
-            id: 2,
-            empresa: 'Industrias Colombia LTDA',
-            nit: '800.987.654-3',
-            sector: 'Manufactura',
-            empleados: '200-500',
-            contacto: 'Carlos Rodríguez',
-            cargo: 'Director de Talento Humano',
-            email: 'carlos.rodriguez@industrias.com',
-            fecha: new Date('2024-01-20')
-          },
-          {
-            id: 3,
-            empresa: 'Servicios Empresariales',
-            nit: '700.456.789-1',
-            sector: 'Servicios',
-            empleados: '10-50',
-            contacto: 'Ana López',
-            cargo: 'Coordinadora de Personal',
-            email: 'ana.lopez@servicios.com',
-            fecha: new Date('2024-01-25')
-          }
-        ]
+        // Mapear los datos del API a la estructura esperada por la grid
+        datosRegistros.value = response.data.map(item => ({
+          id: item.id,
+          empresa: item.company || '',
+          nit: item.nit || '',
+          sector: item.sector || '',
+          empleados: item.employees_number || 0,
+          contacto: item.chief_name || '',
+          cargo: item.company_role || '',
+          email: item.chief_email || '',
+          fecha: item.created_at ? new Date(item.created_at) : new Date(),
+          userId: item.user_id
+        }))
+        
+        // Actualizar información de paginación
+        totalItems.value = response.totalItems
+        totalPages.value = response.totalPages
+        currentPage.value = response.currentPage
+        
       } catch (err) {
         error.value = 'Error al cargar los datos. Intenta nuevamente.'
         console.error('Error cargando datos:', err)
@@ -241,9 +293,12 @@ export default {
       }
       
       if (filtros.value.empleados) {
-        datos = datos.filter(registro => 
-          registro.empleados.toLowerCase().includes(filtros.value.empleados.toLowerCase())
-        )
+        datos = datos.filter(registro => {
+          // Convertir empleados a string para poder buscar
+          const empleadosStr = String(registro.empleados)
+          const filtroStr = String(filtros.value.empleados)
+          return empleadosStr.includes(filtroStr)
+        })
       }
       
       // Aplicar ordenamiento
@@ -320,6 +375,46 @@ export default {
       }
     }
 
+    // Páginas visibles para la paginación
+    const paginasVisibles = computed(() => {
+      const paginas = []
+      const rango = 2 // Mostrar 2 páginas antes y después de la actual
+      
+      let inicio = Math.max(1, currentPage.value - rango)
+      let fin = Math.min(totalPages.value, currentPage.value + rango)
+      
+      // Ajustar para mostrar siempre 5 páginas cuando sea posible
+      if (fin - inicio < 4) {
+        if (inicio === 1) {
+          fin = Math.min(totalPages.value, inicio + 4)
+        } else if (fin === totalPages.value) {
+          inicio = Math.max(1, fin - 4)
+        }
+      }
+      
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i)
+      }
+      
+      return paginas
+    })
+
+    // Función para cambiar de página
+    const cambiarPagina = (nuevaPagina) => {
+      if (nuevaPagina >= 1 && nuevaPagina <= totalPages.value && nuevaPagina !== currentPage.value) {
+        currentPage.value = nuevaPagina
+        cargarDatos()
+        // Scroll hacia arriba al cambiar de página
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }
+
+    // Función para cambiar el tamaño de página
+    const cambiarTamanoPagina = () => {
+      currentPage.value = 1 // Volver a la primera página
+      cargarDatos()
+    }
+
     // Cargar datos al montar el componente
     onMounted(() => {
       cargarDatos()
@@ -334,11 +429,18 @@ export default {
       ordenActual,
       direccionOrden,
       datosFiltrados,
+      currentPage,
+      pageSize,
+      totalItems,
+      totalPages,
+      paginasVisibles,
       limpiarFiltros,
       ordenarPor,
       formatearFecha,
       descargarPDF,
-      cargarDatos
+      cargarDatos,
+      cambiarPagina,
+      cambiarTamanoPagina
     }
   }
 }
@@ -544,6 +646,88 @@ export default {
   animation: spin 1s linear infinite;
 }
 
+/* Paginación */
+.paginacion-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.paginacion {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.paginas-numeros {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-pagina {
+  min-width: 40px;
+  height: 40px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-pagina:hover:not(:disabled) {
+  background: #0067b1;
+  color: white;
+  border-color: #0067b1;
+}
+
+.btn-pagina:disabled {
+  background: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+  border-color: #dee2e6;
+}
+
+.btn-pagina.activa {
+  background: #0067b1;
+  color: white;
+  border-color: #0067b1;
+  font-weight: 600;
+}
+
+.info-paginacion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.select-tamano {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  color: #495057;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.select-tamano:focus {
+  outline: none;
+  border-color: #0067b1;
+  box-shadow: 0 0 0 3px rgba(0, 103, 177, 0.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .datos-grid-container {
@@ -561,6 +745,21 @@ export default {
   .datos-tabla th,
   .datos-tabla td {
     padding: 0.75rem 0.5rem;
+  }
+  
+  .paginacion-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .paginacion {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .info-paginacion {
+    flex-direction: column;
+    text-align: center;
   }
 }
 </style>

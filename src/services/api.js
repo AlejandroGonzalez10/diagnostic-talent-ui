@@ -146,7 +146,8 @@ const ENDPOINTS = {
   QUESTIONS: '/quiestionaire/questions',
   OPTIONS: '/quiestionaire/options',
   QUESTIONNAIRE: '/quiestionaire',
-  QUESTIONNAIRE_ANSWER: '/quiestionaire/answer'
+  QUESTIONNAIRE_ANSWER: '/quiestionaire/answer',
+  QUESTIONNAIRE_REPORT: '/quiestionaire/report'
 }
 
 export const categoriesApi = {
@@ -255,6 +256,17 @@ export const authApi = {
       } else {
         throw new Error('Error de conexión. Intenta nuevamente.')
       }
+    }
+  }
+}
+
+export const reportesApi = {
+  async obtenerReportes(page = 1, pageSize = 10) {
+    try {
+      return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_REPORT}?page=${page}&pageSize=${pageSize}`)
+    } catch (error) {
+      console.error('📊 REPORTES: Error al obtener reportes:', error)
+      throw new Error('No se pudieron cargar los reportes')
     }
   }
 }
