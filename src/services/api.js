@@ -189,6 +189,15 @@ export const optionsApi = {
 }
 
 export const questionnaireApi = {
+  async get() {
+    try {
+      return await httpClient.get(ENDPOINTS.QUESTIONNAIRE)
+    } catch (error) {
+      console.error('🌐 API: Error en get:', error)
+      throw new Error('No se pudieron obtener los datos generales')
+    }
+  },
+
   async submit(data) {
     try {
       return await httpClient.post(ENDPOINTS.QUESTIONNAIRE, data)
@@ -204,6 +213,15 @@ export const questionnaireApi = {
     } catch (error) {
       console.error('🌐 API: Error en update:', error)
       throw new Error('No se pudieron actualizar los datos generales')
+    }
+  },
+
+  async getAnswers(generalDataId) {
+    try {
+      return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_ANSWER}/${generalDataId}`)
+    } catch (error) {
+      console.error('🌐 API: Error en getAnswers:', error)
+      throw new Error('No se pudieron obtener las respuestas')
     }
   },
 
@@ -286,6 +304,14 @@ export const cuestionarioApi = {
 
   async obtenerOpciones() {
     return optionsApi.getAll()
+  },
+
+  async obtenerDatosGenerales() {
+    return questionnaireApi.get()
+  },
+
+  async obtenerRespuestas(generalDataId) {
+    return questionnaireApi.getAnswers(generalDataId)
   },
 
   async enviarDatosGenerales(data) {

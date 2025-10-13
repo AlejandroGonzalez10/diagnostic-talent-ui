@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useValidacion } from '@/composables/useValidacion'
 import { useCuestionario } from '@/composables/useCuestionario'
 import { cuestionarioApi } from '@/services/api'
@@ -136,7 +136,7 @@ export default {
   emits: ['update:datos', 'validacion-cambio', 'datos-enviados'],
   setup(props, { emit }) {
     const { validarEmail } = useValidacion()
-    const { generalDataId, setGeneralDataId } = useCuestionario()
+    const { generalDataId, setGeneralDataId, cargarDatosGenerales } = useCuestionario()
     
     const datosLocales = ref({ ...props.datosIniciales })
     const errores = ref({
@@ -150,8 +150,49 @@ export default {
     })
     const enviandoDatos = ref(false)
     const registroCreado = ref(false)
+    const cargandoDatos = ref(false)
 
-    // Crear registro inicial cuando se monta el componente
+    // Intentar cargar datos existentes o crear registro inicial
+    const inicializarDatos = async () => {
+      if (registroCreado.value || cargandoDatos.value) return
+      
+      cargandoDatos.value = true
+      
+      try {
+        // Primero intentar cargar datos existentes
+        const datosExistentes = await cargarDatosGenerales()
+        
+        if (datosExistentes && datosExistentes.id) {
+          // Si hay datos existentes, cargarlos en el formulario
+          datosLocales.value = {
+            entidad: datosExistentes.entidad,
+            nit: datosExistentes.nit,
+            sector: datosExistentes.sector,
+            empleados: datosExistentes.empleados,
+            nombre: datosExistentes.nombre,
+            cargo: datosExistentes.cargo,
+            correo: datosExistentes.correo
+          }
+          
+          registroCreado.value = true
+          emit('datos-enviados', datosExistentes.id)
+          emit('update:datos', datosLocales.value)
+          
+          console.log('✅ Datos generales precargados:', datosExistentes.id)
+        } else {
+          // Si no hay datos existentes, crear un nuevo registro
+          await crearRegistroInicial()
+        }
+      } catch (error) {
+        console.error('❌ Error al inicializar datos:', error)
+        // Si falla la carga, intentar crear registro inicial
+        await crearRegistroInicial()
+      } finally {
+        cargandoDatos.value = false
+      }
+    }
+
+    // Crear registro inicial cuando no hay datos existentes
     const crearRegistroInicial = async () => {
       if (registroCreado.value) return
       
@@ -162,6 +203,8 @@ export default {
         setGeneralDataId(respuesta.id)
         registroCreado.value = true
         emit('datos-enviados', respuesta.id)
+        
+        console.log('✅ Registro inicial creado:', respuesta.id)
       } catch (error) {
         console.error('❌ Error al crear registro inicial:', error)
       }
@@ -217,8 +260,10 @@ export default {
       emit('update:datos', datosLocales.value)
     }
 
-    // Crear registro inicial cuando se monta el componente
-    crearRegistroInicial()
+    // Inicializar datos al montar el componente
+    onMounted(() => {
+      inicializarDatos()
+    })
 
     return {
       datosLocales,

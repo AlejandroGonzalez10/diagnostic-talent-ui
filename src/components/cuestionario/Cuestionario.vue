@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import CodigoAcceso from './components/CodigoAcceso.vue'
 import FormularioDatos from './components/FormularioDatos.vue'
 import DescripcionCuestionario from './components/DescripcionCuestionario.vue'
@@ -61,6 +61,7 @@ export default {
   },
   setup() {
     const {
+      preguntas,
       categorias,
       preguntasPorCategoria,
       opciones,
@@ -68,7 +69,9 @@ export default {
       isLoading,
       error,
       formularioCompleto,
+      generalDataId,
       cargarDatosGuardados,
+      cargarRespuestasGuardadas,
       fetchPreguntas,
       setGeneralDataId,
       guardarRespuesta,
@@ -91,6 +94,7 @@ export default {
       correo: ''
     })
     const datosValidos = ref(false)
+    const pendienteCargarRespuestas = ref(null)
 
     const iniciarCuestionario = (authData) => {
       // Guardar datos de autenticación
@@ -100,18 +104,43 @@ export default {
       fetchPreguntas()
     }
 
-    const onDatosEnviados = (generalDataId) => {
-      setGeneralDataId(generalDataId)
+    const onDatosEnviados = async (generalDataIdRecibido) => {
+      setGeneralDataId(generalDataIdRecibido)
+      
+      // Guardar el ID para cargar las respuestas cuando las preguntas estén listas
+      if (generalDataIdRecibido) {
+        pendienteCargarRespuestas.value = generalDataIdRecibido
+      }
     }
 
-    onMounted(() => {
+    // Watcher para cargar respuestas cuando las preguntas estén listas
+    watch(
+      () => preguntas.value.length,
+      async (newLength) => {
+        if (newLength > 0 && pendienteCargarRespuestas.value) {
+          const idParaCargar = pendienteCargarRespuestas.value
+          pendienteCargarRespuestas.value = null
+          
+          await cargarRespuestasGuardadas(idParaCargar)
+          console.log('✅ Respuestas precargadas para generalDataId:', idParaCargar)
+        }
+      }
+    )
+
+    onMounted(async () => {
       // Cargar datos guardados primero
       cargarDatosGuardados()
       
       // Verificar si ya está autenticado
       if (isAuthenticated.value && token.value) {
         codigoValidado.value = true
-        fetchPreguntas()
+        await fetchPreguntas()
+        
+        // Si hay generalDataId guardado, cargar las respuestas
+        if (generalDataId.value) {
+          await cargarRespuestasGuardadas(generalDataId.value)
+          console.log('✅ Respuestas precargadas al montar componente')
+        }
       }
     })
 

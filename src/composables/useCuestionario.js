@@ -108,6 +108,81 @@ export function useCuestionario() {
     }
   }
 
+  // 📥 Función para cargar datos generales existentes
+  const cargarDatosGenerales = async () => {
+    try {
+      const response = await cuestionarioApi.obtenerDatosGenerales()
+      
+      if (response && response.id) {
+        // Guardar el ID de datos generales
+        setGeneralDataId(response.id)
+        
+        // Retornar los datos para que el componente los use
+        return {
+          id: response.id,
+          entidad: response.company || '',
+          nit: response.nit || '',
+          sector: response.sector || '',
+          empleados: response.employees_number || '',
+          nombre: response.chief_name || '',
+          cargo: response.company_role || '',
+          correo: response.chief_email || ''
+        }
+      }
+      
+      return null
+    } catch (error) {
+      console.error('❌ Error al cargar datos generales:', error)
+      return null
+    }
+  }
+
+  // 📥 Función para cargar respuestas existentes
+  const cargarRespuestasGuardadas = async (generalDataId) => {
+    try {
+      console.log('🔄 Cargando respuestas para generalDataId:', generalDataId)
+      const response = await cuestionarioApi.obtenerRespuestas(generalDataId)
+      
+      console.log('📦 Respuesta del servidor:', response)
+      
+      if (response && Array.isArray(response)) {
+        console.log(`✅ Se encontraron ${response.length} respuestas`)
+        
+        // Crear un nuevo objeto para forzar la reactividad
+        const nuevasRespuestas = { ...respuestas.value }
+        
+        // Mapear las respuestas al formato esperado
+        response.forEach(respuesta => {
+          if (respuesta.question_id && respuesta.value !== undefined) {
+            // El value puede ser un número decimal como 2.5
+            nuevasRespuestas[respuesta.question_id] = respuesta.value
+            
+            console.log(`📝 Cargando respuesta: pregunta ${respuesta.question_id} = ${respuesta.value}`)
+            
+            // Guardar en sessionStorage para control de duplicados
+            const claveRegistro = `respuesta_${respuesta.general_data_id}_${respuesta.category_id}_${respuesta.question_id}`
+            if (respuesta.id) {
+              sessionStorage.setItem(claveRegistro, respuesta.id.toString())
+            }
+          }
+        })
+        
+        // Asignar el nuevo objeto para activar la reactividad
+        respuestas.value = nuevasRespuestas
+        
+        console.log('✅ Respuestas cargadas en el estado:', respuestas.value)
+        console.log('📊 Total de respuestas cargadas:', Object.keys(respuestas.value).length)
+        return true
+      }
+      
+      console.log('⚠️ No se encontraron respuestas o formato inválido')
+      return false
+    } catch (error) {
+      console.error('❌ Error al cargar respuestas guardadas:', error)
+      return false
+    }
+  }
+
   const fetchCategorias = async () => {
     try {
       isLoading.value = true
@@ -413,6 +488,8 @@ export function useCuestionario() {
     cargarDatosGuardados,
     guardarRespuesta,
     enviarRespuestaAutomatica,
+    cargarDatosGenerales,
+    cargarRespuestasGuardadas,
     
     // 🔐 Funciones de autenticación
     autenticar,
