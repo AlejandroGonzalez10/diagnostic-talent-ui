@@ -177,8 +177,6 @@ export default {
           registroCreado.value = true
           emit('datos-enviados', datosExistentes.id)
           emit('update:datos', datosLocales.value)
-          
-          console.log('✅ Datos generales precargados:', datosExistentes.id)
         } else {
           // Si no hay datos existentes, crear un nuevo registro
           await crearRegistroInicial()
@@ -203,8 +201,6 @@ export default {
         setGeneralDataId(respuesta.id)
         registroCreado.value = true
         emit('datos-enviados', respuesta.id)
-        
-        console.log('✅ Registro inicial creado:', respuesta.id)
       } catch (error) {
         console.error('❌ Error al crear registro inicial:', error)
       }

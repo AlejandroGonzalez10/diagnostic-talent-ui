@@ -122,7 +122,6 @@ export default {
           pendienteCargarRespuestas.value = null
           
           await cargarRespuestasGuardadas(idParaCargar)
-          console.log('✅ Respuestas precargadas para generalDataId:', idParaCargar)
         }
       }
     )
@@ -139,7 +138,6 @@ export default {
         // Si hay generalDataId guardado, cargar las respuestas
         if (generalDataId.value) {
           await cargarRespuestasGuardadas(generalDataId.value)
-          console.log('✅ Respuestas precargadas al montar componente')
         }
       }
     })

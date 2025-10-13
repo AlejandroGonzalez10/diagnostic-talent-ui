@@ -140,14 +140,9 @@ export function useCuestionario() {
   // 📥 Función para cargar respuestas existentes
   const cargarRespuestasGuardadas = async (generalDataId) => {
     try {
-      console.log('🔄 Cargando respuestas para generalDataId:', generalDataId)
       const response = await cuestionarioApi.obtenerRespuestas(generalDataId)
       
-      console.log('📦 Respuesta del servidor:', response)
-      
       if (response && Array.isArray(response)) {
-        console.log(`✅ Se encontraron ${response.length} respuestas`)
-        
         // Crear un nuevo objeto para forzar la reactividad
         const nuevasRespuestas = { ...respuestas.value }
         
@@ -156,8 +151,6 @@ export function useCuestionario() {
           if (respuesta.question_id && respuesta.value !== undefined) {
             // El value puede ser un número decimal como 2.5
             nuevasRespuestas[respuesta.question_id] = respuesta.value
-            
-            console.log(`📝 Cargando respuesta: pregunta ${respuesta.question_id} = ${respuesta.value}`)
             
             // Guardar en sessionStorage para control de duplicados
             const claveRegistro = `respuesta_${respuesta.general_data_id}_${respuesta.category_id}_${respuesta.question_id}`
@@ -170,12 +163,9 @@ export function useCuestionario() {
         // Asignar el nuevo objeto para activar la reactividad
         respuestas.value = nuevasRespuestas
         
-        console.log('✅ Respuestas cargadas en el estado:', respuestas.value)
-        console.log('📊 Total de respuestas cargadas:', Object.keys(respuestas.value).length)
         return true
       }
       
-      console.log('⚠️ No se encontraron respuestas o formato inválido')
       return false
     } catch (error) {
       console.error('❌ Error al cargar respuestas guardadas:', error)

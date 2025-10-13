@@ -100,9 +100,7 @@ export default {
   watch: {
     respuestas: {
       handler(newVal) {
-        console.log('🔄 ListaPreguntas: Actualizando respuestasLocales con:', newVal)
         this.respuestasLocales = { ...newVal }
-        console.log('✅ ListaPreguntas: respuestasLocales actualizado:', this.respuestasLocales)
       },
       immediate: true,
       deep: true
