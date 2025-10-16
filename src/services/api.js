@@ -1,5 +1,5 @@
 const API_CONFIG = {
-  baseURL: process.env.NODE_ENV === 'development' ? '/api' : (process.env.VUE_APP_API_URL || 'http://localhost:3000'),
+  baseURL: process.env.NODE_ENV === 'development' ? '/api' : (process.env.VUE_APP_API_URL || '/api'),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
