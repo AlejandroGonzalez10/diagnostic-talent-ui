@@ -134,4 +134,144 @@ export default {
   line-height: 1.4;
   font-size: 0.95rem;
 }
+
+/* Estilos para impresión/PDF */
+@media print {
+  .form-header {
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+  }
+
+  .form-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+    color: #2c3e50;
+  }
+
+  .descripcion-diagnostico {
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  .descripcion-diagnostico p {
+    display: block !important;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 0.6rem;
+    text-align: justify;
+  }
+
+  .pilares-analisis {
+    margin-top: 1rem;
+    page-break-inside: avoid;
+  }
+
+  .pilares-analisis h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .pilares-analisis ul {
+    gap: 0.8rem;
+    grid-template-columns: 1fr;
+  }
+
+  .pilares-analisis li {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    page-break-inside: avoid;
+    background: #f8f9fa !important;
+    border-left: 4px solid #FFC107 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .pilares-analisis li > div:first-child {
+    flex: 1;
+  }
+
+  .pilares-analisis strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .pilares-analisis .peso-categoria {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0067b1 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    flex-shrink: 0;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .pilares-analisis p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
 </style>
+/* Estilos para impresi�n/PDF */
+@media print {
+  .form-header {
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+  }
+
+  .form-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+
+  .descripcion-diagnostico {
+    display: none !important;
+  }
+
+  .pilares-analisis {
+    margin-top: 0.5rem;
+    page-break-inside: avoid;
+  }
+
+  .pilares-analisis h3 {
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+  }
+
+  .pilares-analisis ul {
+    gap: 0.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .pilares-analisis li {
+    padding: 0.8rem;
+    page-break-inside: avoid;
+    background: #f8f9fa !important;
+    border-left: 4px solid #FFC107 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pilares-analisis strong {
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+  }
+
+  .pilares-analisis .peso-categoria {
+    font-size: 1.2rem;
+    color: #0067b1 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pilares-analisis p {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+}

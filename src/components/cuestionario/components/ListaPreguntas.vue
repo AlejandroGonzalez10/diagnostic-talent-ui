@@ -9,7 +9,7 @@
       <div class="preguntas-lista">
         <div v-for="(pregunta, index) in preguntasPorCategoria[categoria.id]" 
              :key="pregunta.id"
-             class="pregunta-item"
+             class="pregunta-item ocultar-en-pdf"
              :class="{ 'respondida': respuestasLocales[pregunta.id] }">
           <div class="pregunta-numero-mobile">{{ index + 1 }}</div>
           <div class="pregunta-header">
@@ -51,13 +51,34 @@
     </div>
 
     <!-- Puntaje total -->
-    <div class="puntaje-total">
-      <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
-      <button @click="generarPDF" class="btn-ver-resultado" :disabled="generandoPDF">
+    <div class="puntaje-total ocultar-en-pdf">
+      <div>
+        <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
+      </div>
+      <button 
+        @click="generarPDF" 
+        class="btn-ver-resultado" 
+        :disabled="generandoPDF"
+      >
         <span v-if="generandoPDF" class="loading-mini"></span>
         <span v-else>📄</span>
         {{ generandoPDF ? 'Generando PDF...' : 'Ver Resultado' }}
       </button>
+    </div>
+
+    <!-- Alert personalizado -->
+    <div v-if="mostrarAlerta" class="alert-overlay" @click="cerrarAlerta">
+      <div class="alert-modal" @click.stop>
+        <div class="alert-icon">⚠️</div>
+        <h3 class="alert-titulo">Datos Incompletos</h3>
+        <p class="alert-mensaje">
+          Por favor, completa todos los <strong>datos iniciales</strong> antes de generar el PDF.
+        </p>
+        <p class="alert-submensaje">
+          Verifica que hayas completado: Nombre de la empresa, NIT, Sector, Número de empleados, Nombre completo de quien diligencia, Cargo y Correo electrónico.
+        </p>
+        <button @click="cerrarAlerta" class="alert-btn">Entendido</button>
+      </div>
     </div>
   </div>
 </template>
@@ -88,13 +109,18 @@ export default {
     guardarRespuesta: {
       type: Function,
       required: true
+    },
+    datosCompletos: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:respuestas', 'respuestas-cambio'],
   data() {
     return {
       respuestasLocales: {},
-      generandoPDF: false
+      generandoPDF: false,
+      mostrarAlerta: false
     }
   },
   watch: {
@@ -200,6 +226,12 @@ export default {
       this.$emit('respuestas-cambio')
     },
     async generarPDF() {
+      // Validar que los datos generales estén completos
+      if (!this.datosCompletos) {
+        this.mostrarAlerta = true
+        return
+      }
+      
       this.generandoPDF = true
       
       try {
@@ -215,6 +247,9 @@ export default {
       } finally {
         this.generandoPDF = false
       }
+    },
+    cerrarAlerta() {
+      this.mostrarAlerta = false
     }
   }
 }
@@ -386,6 +421,16 @@ input[type="radio"]:checked {
   align-items: center;
 }
 
+.mensaje-advertencia {
+  font-size: 0.9rem;
+  color: #d9534f;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .btn-ver-resultado {
   background: #0067b1;
   color: white;
@@ -410,6 +455,117 @@ input[type="radio"]:checked {
   background: #ccc;
   cursor: not-allowed;
   transform: none;
+  opacity: 0.6;
+}
+
+/* Alert personalizado */
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.alert-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.alert-titulo {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.alert-mensaje {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.alert-mensaje strong {
+  color: #0067b1;
+  font-weight: 600;
+}
+
+.alert-submensaje {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.alert-btn {
+  background: #0067b1;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.alert-btn:hover {
+  background: #005a9e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 103, 177, 0.3);
+}
+
+.alert-btn:active {
+  transform: translateY(0);
 }
 
 .loading-mini {
@@ -428,25 +584,51 @@ input[type="radio"]:checked {
 
 /* Estilos para impresión */
 @media print {
+  /* Ocultar elementos que no deben aparecer en el PDF */
+  .ocultar-en-pdf {
+    display: none !important;
+  }
+  
   .btn-ver-resultado {
+    display: none !important;
+  }
+  
+  .puntaje-total {
+    display: none !important;
+  }
+  
+  .alert-overlay {
     display: none !important;
   }
   
   .categoria-wrapper {
     page-break-inside: avoid;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   
-  .pregunta-item {
-    page-break-inside: avoid;
-    margin-bottom: 10px;
+  .categoria-header {
+    background: #0067b1 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 15px;
+    margin-bottom: 15px;
   }
   
-  .puntaje-total {
-    page-break-before: auto;
-    border-top: 2px solid #0067b1;
-    padding-top: 20px;
-    margin-top: 30px;
+  .categoria-score {
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 15px;
+    background: #f8f9fa !important;
+    border-radius: 8px;
+    margin-top: 10px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .categoria-score strong {
+    color: #0067b1 !important;
+    font-size: 20pt;
   }
   
   .categoria-header {

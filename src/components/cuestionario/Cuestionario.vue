@@ -37,6 +37,7 @@
           v-model:respuestas="respuestas"
           @respuestas-cambio="validarRespuestas"
           :guardar-respuesta="guardarRespuesta"
+          :datos-completos="datosValidos"
         />
       </div>
     </div>
@@ -168,4 +169,25 @@ export default {
 
 <style lang="scss" scoped>
 @import './styles/cuestionario.scss';
+
+/* Estilos globales para impresión */
+@media print {
+  .ocultar-en-pdf {
+    display: none !important;
+  }
+  
+  .cuestionario-container {
+    background: white !important;
+    padding: 20px !important;
+  }
+  
+  .main-form-container {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  .main-form {
+    max-width: 100% !important;
+  }
+}
 </style>

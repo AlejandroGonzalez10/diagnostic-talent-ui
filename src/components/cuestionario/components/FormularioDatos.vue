@@ -14,8 +14,10 @@
               v-model="datosLocales.entidad"
               :class="{ 'error': errores.entidad }"
               @blur="actualizarCampo('entidad')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.entidad || 'No especificado' }}</p>
           </div>
 
           <div class="form-group">
@@ -26,8 +28,10 @@
               v-model="datosLocales.nit"
               :class="{ 'error': errores.nit }"
               @blur="actualizarCampo('nit')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.nit || 'No especificado' }}</p>
           </div>
 
           <div class="form-group">
@@ -38,8 +42,10 @@
               v-model="datosLocales.sector"
               :class="{ 'error': errores.sector }"
               @blur="actualizarCampo('sector')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.sector || 'No especificado' }}</p>
           </div>
 
           <div class="form-group">
@@ -50,8 +56,10 @@
               v-model="datosLocales.empleados"
               :class="{ 'error': errores.empleados }"
               @blur="actualizarCampo('empleados')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.empleados || 'No especificado' }}</p>
           </div>
         </div>
       </div>
@@ -68,8 +76,10 @@
               v-model="datosLocales.nombre"
               :class="{ 'error': errores.nombre }"
               @blur="actualizarCampo('nombre')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.nombre || 'No especificado' }}</p>
           </div>
 
           <div class="form-group">
@@ -80,8 +90,10 @@
               v-model="datosLocales.cargo"
               :class="{ 'error': errores.cargo }"
               @blur="actualizarCampo('cargo')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.cargo || 'No especificado' }}</p>
           </div>
 
           <div class="form-group">
@@ -92,8 +104,10 @@
               v-model="datosLocales.correo"
               :class="{ 'error': errores.correo }"
               @blur="actualizarCampo('correo')"
+              class="ocultar-input-en-pdf"
               required
             />
+            <p class="valor-para-pdf">{{ datosLocales.correo || 'No especificado' }}</p>
           </div>
         </div>
       </div>
@@ -112,7 +126,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useValidacion } from '@/composables/useValidacion'
 import { useCuestionario } from '@/composables/useCuestionario'
 import { cuestionarioApi } from '@/services/api'
@@ -152,6 +166,11 @@ export default {
     const registroCreado = ref(false)
     const cargandoDatos = ref(false)
 
+    // Watch para validar cada vez que cambian los datos
+    watch(datosLocales, () => {
+      validarFormulario()
+    }, { deep: true })
+
     // Intentar cargar datos existentes o crear registro inicial
     const inicializarDatos = async () => {
       if (registroCreado.value || cargandoDatos.value) return
@@ -177,6 +196,7 @@ export default {
           registroCreado.value = true
           emit('datos-enviados', datosExistentes.id)
           emit('update:datos', datosLocales.value)
+          validarFormulario()
         } else {
           // Si no hay datos existentes, crear un nuevo registro
           await crearRegistroInicial()
@@ -254,6 +274,22 @@ export default {
       }
 
       emit('update:datos', datosLocales.value)
+      validarFormulario()
+    }
+
+    // Función para validar si todos los campos están completos
+    const validarFormulario = () => {
+      const todosCompletos = 
+        datosLocales.value.entidad?.trim() !== '' &&
+        datosLocales.value.nit?.trim() !== '' &&
+        datosLocales.value.sector?.trim() !== '' &&
+        datosLocales.value.empleados?.toString().trim() !== '' &&
+        datosLocales.value.cargo?.trim() !== '' &&
+        datosLocales.value.nombre?.trim() !== '' &&
+        datosLocales.value.correo?.trim() !== '' &&
+        validarEmail(datosLocales.value.correo)
+      
+      emit('validacion-cambio', todosCompletos)
     }
 
     // Inicializar datos al montar el componente
@@ -273,4 +309,40 @@ export default {
 
 <style scoped>
 @import '../styles/formulario-datos.scss';
+
+/* Ocultar valores en pantalla normal */
+.valor-para-pdf {
+  display: none;
+}
+
+/* Estilos para impresión */
+@media print {
+  .ocultar-input-en-pdf {
+    display: none !important;
+  }
+  
+  .valor-para-pdf {
+    display: block !important;
+    margin-top: 5px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-size: 14pt;
+    color: #2c3e50;
+    font-weight: 400;
+  }
+  
+  .form-group {
+    page-break-inside: avoid;
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    color: #0067b1 !important;
+    font-size: 12pt;
+    margin-bottom: 5px;
+    display: block;
+  }
+}
 </style>]]>
