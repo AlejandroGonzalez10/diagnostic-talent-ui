@@ -24,17 +24,6 @@
           />
         </div>
         
-        <div class="filtro-item">
-          <label for="buscar-empleados">Número de empleados:</label>
-          <input
-            id="buscar-empleados"
-            type="text"
-            v-model="filtros.empleados"
-            placeholder="Buscar por número de empleados..."
-            class="filtro-input"
-          />
-        </div>
-        
         <div class="filtro-acciones">
           <button @click="limpiarFiltros" class="btn-limpiar">
             Limpiar
@@ -70,7 +59,7 @@
         <thead>
           <tr>
             <th @click="ordenarPor('empresa')" class="sortable">
-              Nombre de la empresa
+              Nombre empresa
               <span class="sort-icon" v-if="ordenActual === 'empresa'">
                 {{ direccionOrden === 'asc' ? '↑' : '↓' }}
               </span>
@@ -94,7 +83,7 @@
               </span>
             </th>
             <th @click="ordenarPor('contacto')" class="sortable">
-              Nombre completo de quien diligencia
+              Nombre quien diligenció
               <span class="sort-icon" v-if="ordenActual === 'contacto'">
                 {{ direccionOrden === 'asc' ? '↑' : '↓' }}
               </span>
@@ -232,8 +221,7 @@ export default {
     // Filtros
     const filtros = ref({
       empresa: '',
-      sector: '',
-      empleados: ''
+      sector: ''
     })
     
     // Ordenamiento
@@ -290,15 +278,6 @@ export default {
         datos = datos.filter(registro => 
           registro.sector.toLowerCase().includes(filtros.value.sector.toLowerCase())
         )
-      }
-      
-      if (filtros.value.empleados) {
-        datos = datos.filter(registro => {
-          // Convertir empleados a string para poder buscar
-          const empleadosStr = String(registro.empleados)
-          const filtroStr = String(filtros.value.empleados)
-          return empleadosStr.includes(filtroStr)
-        })
       }
       
       // Aplicar ordenamiento
@@ -450,8 +429,8 @@ export default {
 .filtros-container {
   background: #f8f9fa;
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
 .filtros-grid {
@@ -519,13 +498,15 @@ export default {
 
 .tabla-container {
   overflow-x: auto;
+  padding: 0;
+  margin: 0;
 }
 
 .loading-state,
 .error-state,
 .empty-state {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem 0;
 }
 
 .loading-spinner {

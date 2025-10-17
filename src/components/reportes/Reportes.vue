@@ -51,9 +51,10 @@ export default {
 }
 
 .reportes-main {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 1rem 2rem 1rem;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem 0.5rem 2rem 0.5rem;
 }
 
 .reportes-content {
@@ -64,14 +65,14 @@ export default {
 .datos-section {
   background: white;
   border-radius: 20px;
-  padding: 2.5rem;
+  padding: 1rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-header h2 {
