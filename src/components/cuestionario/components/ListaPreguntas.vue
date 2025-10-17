@@ -50,11 +50,8 @@
       </div>
     </div>
 
-    <!-- Puntaje total -->
-    <div class="puntaje-total ocultar-en-pdf">
-      <div>
-        <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
-      </div>
+    <!-- Botón para generar PDF (solo visible en pantalla) -->
+    <div class="boton-container ocultar-en-pdf">
       <button 
         @click="generarPDF" 
         class="btn-ver-resultado" 
@@ -64,6 +61,11 @@
         <span v-else>📄</span>
         {{ generandoPDF ? 'Generando PDF...' : 'Ver Resultado' }}
       </button>
+    </div>
+
+    <!-- Puntaje total (solo visible en PDF) -->
+    <div class="puntaje-total-pdf solo-pdf">
+      <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
     </div>
 
     <!-- Alert personalizado -->
@@ -421,6 +423,30 @@ input[type="radio"]:checked {
   align-items: center;
 }
 
+.boton-container {
+  margin-top: 2rem;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.solo-pdf {
+  display: none;
+}
+
+.puntaje-total-pdf {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.puntaje-total-pdf h3 {
+  font-size: 1.5rem;
+  color: #0067b1;
+  margin: 0;
+}
+
 .mensaje-advertencia {
   font-size: 0.9rem;
   color: #d9534f;
@@ -596,9 +622,39 @@ input[type="radio"]:checked {
   .puntaje-total {
     display: none !important;
   }
+
+  .boton-container {
+    display: none !important;
+  }
   
   .alert-overlay {
     display: none !important;
+  }
+
+  /* Mostrar puntaje total solo en PDF */
+  .solo-pdf {
+    display: block !important;
+  }
+
+  .puntaje-total-pdf {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    text-align: center;
+    background: #f8f9fa !important;
+    border: 3px solid #0067b1 !important;
+    border-radius: 8px;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .puntaje-total-pdf h3 {
+    font-size: 1.8rem;
+    color: #0067b1 !important;
+    font-weight: bold;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   
   .categoria-wrapper {
