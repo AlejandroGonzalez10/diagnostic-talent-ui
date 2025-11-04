@@ -51,6 +51,7 @@ import FormularioDatos from './components/FormularioDatos.vue'
 import DescripcionCuestionario from './components/DescripcionCuestionario.vue'
 import ListaPreguntas from './components/ListaPreguntas.vue'
 import { useCuestionario } from '@/composables/useCuestionario'
+import { cuestionarioApi } from '@/services/api'
 
 export default {
   name: 'DiagnosticQuestionnaire',
@@ -140,6 +141,27 @@ export default {
         if (generalDataId.value) {
           await cargarRespuestasGuardadas(generalDataId.value)
         }
+      } else {
+        // Intentar obtener el código de acceso desde las variables de entorno
+        const codigoAccesoEnv = process.env.VUE_APP_CODIGO_ACCESO
+        
+        if (codigoAccesoEnv) {
+          // Si existe el código en el environment, validarlo automáticamente
+          try {
+            const response = await cuestionarioApi.autenticar(codigoAccesoEnv)
+            
+            if (response.token && response.user) {
+              // Autenticar con los datos recibidos
+              iniciarCuestionario({
+                token: response.token,
+                user: response.user
+              })
+            }
+          } catch (error) {
+            // Si falla, se mostrará el componente de código de acceso
+          }
+        }
+        // Si no hay código en environment, se mostrará el componente de código de acceso
       }
     })
 

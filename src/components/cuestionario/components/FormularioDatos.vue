@@ -36,15 +36,26 @@
 
           <div class="form-group">
             <label for="sector">Sector</label>
-            <input
-              type="text"
+            <select
               id="sector"
               v-model="datosLocales.sector"
               :class="{ 'error': errores.sector }"
               @blur="actualizarCampo('sector')"
               class="ocultar-input-en-pdf"
               required
-            />
+            >
+              <option value="" disabled>Seleccione un sector</option>
+              <option value="Tecnología">Tecnología</option>
+              <option value="Financiero">Financiero</option>
+              <option value="Salud">Salud</option>
+              <option value="Educación">Educación</option>
+              <option value="Manufactura">Manufactura</option>
+              <option value="Retail">Retail</option>
+              <option value="Construcción">Construcción</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Otro">Otro</option>
+            </select>
             <p class="valor-para-pdf">{{ datosLocales.sector || 'No especificado' }}</p>
           </div>
 

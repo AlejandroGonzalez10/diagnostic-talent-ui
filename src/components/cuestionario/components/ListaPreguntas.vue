@@ -50,16 +50,16 @@
       </div>
     </div>
 
-    <!-- Botón para generar PDF (solo visible en pantalla) -->
+    <!-- Botón para ver resultado -->
     <div class="boton-container ocultar-en-pdf">
       <button 
-        @click="generarPDF" 
+        @click="mostrarResultado" 
         class="btn-ver-resultado" 
-        :disabled="generandoPDF"
+        :disabled="cargandoResultado"
       >
-        <span v-if="generandoPDF" class="loading-mini"></span>
-        <span v-else>📄</span>
-        {{ generandoPDF ? 'Generando PDF...' : 'Ver Resultado' }}
+        <span v-if="cargandoResultado" class="loading-mini"></span>
+        <span v-else>&#128202;</span>
+        {{ cargandoResultado ? 'Cargando...' : 'Ver Resultado' }}
       </button>
     </div>
 
@@ -68,18 +68,39 @@
       <h3>Puntaje Total: {{ calcularPuntajeTotal() }}</h3>
     </div>
 
-    <!-- Alert personalizado -->
+    <!-- Alert de datos incompletos -->
     <div v-if="mostrarAlerta" class="alert-overlay" @click="cerrarAlerta">
       <div class="alert-modal" @click.stop>
         <div class="alert-icon">⚠️</div>
-        <h3 class="alert-titulo">Datos Incompletos</h3>
-        <p class="alert-mensaje">
-          Por favor, completa todos los <strong>datos iniciales</strong> antes de generar el PDF.
-        </p>
-        <p class="alert-submensaje">
-          Verifica que hayas completado: Nombre de la empresa, NIT, Sector, Número de empleados, Nombre completo de quien diligencia, Cargo y Correo electrónico.
-        </p>
+        <h3 class="alert-titulo">{{ alertaTitulo }}</h3>
+        <p class="alert-mensaje" v-html="alertaMensaje"></p>
+        <p class="alert-submensaje" v-if="alertaSubmensaje">{{ alertaSubmensaje }}</p>
         <button @click="cerrarAlerta" class="alert-btn">Entendido</button>
+      </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div v-if="mostrarModalResultado" class="resultado-overlay">
+      <div class="resultado-modal" @click.stop>
+
+        <div class="resultado-contenido">
+          <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
+          
+          <div class="puntaje-principal">
+            <div class="puntaje-numero">{{ calcularPuntajeTotal() }}</div>
+            <div class="puntaje-clasificacion" :class="getClasificacionClass()">
+              {{ getClasificacionTexto() }}
+            </div>
+          </div>
+
+          <div class="resultado-descripcion">
+            <p v-html="getDescripcionResultado()"></p>
+          </div>
+        </div>
+
+        <div class="resultado-footer">
+          <button @click="cerrarModalResultado" class="btn-cerrar-resultado">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -121,8 +142,12 @@ export default {
   data() {
     return {
       respuestasLocales: {},
-      generandoPDF: false,
-      mostrarAlerta: false
+      cargandoResultado: false,
+      mostrarAlerta: false,
+      mostrarModalResultado: false,
+      alertaTitulo: '',
+      alertaMensaje: '',
+      alertaSubmensaje: ''
     }
   },
   watch: {
@@ -227,31 +252,100 @@ export default {
       this.$emit('update:respuestas', this.respuestasLocales)
       this.$emit('respuestas-cambio')
     },
-    async generarPDF() {
+    validarTodasLasRespuestas() {
+      // Contar el total de preguntas en todas las categorías
+      let totalPreguntas = 0
+      let preguntasRespondidas = 0
+
+      this.categorias.forEach(categoria => {
+        const preguntas = this.preguntasPorCategoria[categoria.id] || []
+        totalPreguntas += preguntas.length
+
+        preguntas.forEach(pregunta => {
+          if (this.respuestasLocales[pregunta.id]) {
+            preguntasRespondidas++
+          }
+        })
+      })
+
+      return preguntasRespondidas === totalPreguntas && totalPreguntas > 0
+    },
+    async mostrarResultado() {
       // Validar que los datos generales estén completos
       if (!this.datosCompletos) {
+        this.alertaTitulo = 'Datos Incompletos'
+        this.alertaMensaje = 'Por favor, completa todos los <strong>datos iniciales</strong> antes de ver el resultado.'
+        this.alertaSubmensaje = 'Verifica que hayas completado: Nombre de la empresa, NIT, Sector, Número de empleados, Nombre completo de quien diligencia, Cargo y Correo electrónico.'
+        this.mostrarAlerta = true
+        return
+      }
+
+      // Validar que todas las preguntas estén respondidas
+      if (!this.validarTodasLasRespuestas()) {
+        this.alertaTitulo = 'Cuestionario Incompleto'
+        this.alertaMensaje = 'Por favor, responde <strong>todas las preguntas</strong> del cuestionario antes de ver el resultado.'
+        this.alertaSubmensaje = 'Asegúrate de haber respondido cada pregunta en todos los pilares de análisis.'
         this.mostrarAlerta = true
         return
       }
       
-      this.generandoPDF = true
+      this.cargandoResultado = true
       
       try {
-        // Pequeña pausa para mostrar el estado de loading
+        // Pequeña pausa para simular carga
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        // Usar window.print() para imprimir la página actual
-        window.print()
+        // Mostrar modal con resultado
+        this.mostrarModalResultado = true
         
       } catch (error) {
-        console.error('Error al generar PDF:', error)
-        alert('Error al generar el PDF. Intenta nuevamente.')
+        console.error('Error al cargar resultado:', error)
+        alert('Error al cargar el resultado. Intenta nuevamente.')
       } finally {
-        this.generandoPDF = false
+        this.cargandoResultado = false
       }
     },
     cerrarAlerta() {
       this.mostrarAlerta = false
+    },
+    cerrarModalResultado() {
+      this.mostrarModalResultado = false
+    },
+    getClasificacionTexto() {
+      const puntaje = parseFloat(this.calcularPuntajeTotal())
+      
+      if (puntaje >= 1 && puntaje <= 2) {
+        return 'En Crecimiento'
+      } else if (puntaje > 2 && puntaje <= 3.4) {
+        return 'Maduración'
+      } else if (puntaje > 3.4 && puntaje <= 5) {
+        return 'Consolidación'
+      }
+      return 'Sin clasificar'
+    },
+    getClasificacionClass() {
+      const puntaje = parseFloat(this.calcularPuntajeTotal())
+      
+      if (puntaje >= 1 && puntaje <= 2) {
+        return 'clasificacion-crecimiento'
+      } else if (puntaje > 2 && puntaje <= 3.4) {
+        return 'clasificacion-maduracion'
+      } else if (puntaje > 3.4 && puntaje <= 5) {
+        return 'clasificacion-consolidacion'
+      }
+      return ''
+    },
+    getDescripcionResultado() {
+      const puntaje = parseFloat(this.calcularPuntajeTotal())
+      
+      if (puntaje >= 1 && puntaje <= 2) {
+        return '<strong>Es necesario fortalecer la base de la gestión del talento humano mediante la formalización de procesos y prácticas clave.</strong><br>Se sugiere documentar políticas, estandarizar procedimientos y establecer roles y responsabilidades que aseguren una gestión más consistente y alineada con los objetivos organizacionales.'
+      } else if (puntaje > 2 && puntaje <= 3.4) {
+        return '<strong>Es importante avanzar en la integración y alineación de los procesos de gestión del talento con la estrategia organizacional.</strong><br>Se recomienda revisar la coherencia entre las prácticas de atracción, desarrollo y retención, y los objetivos del negocio, para garantizar una gestión más estratégica y orientada a resultados.'
+      } else if (puntaje > 3.4 && puntaje <= 5) {
+        return '<strong>La organización se encuentra en una etapa de madurez que le permite fortalecer su enfoque en innovación, analítica y experiencia del colaborador.</strong><br>Se recomienda consolidar estas capacidades integrándolas en la estrategia de talento, promoviendo una cultura de mejora continua y utilizando los datos para potenciar el bienestar y el desempeño del equipo.'
+      }
+      return 'Complete el diagnóstico para obtener una clasificación.'
     }
   }
 }
@@ -594,6 +688,209 @@ input[type="radio"]:checked {
   transform: translateY(0);
 }
 
+/* Modal de Resultado */
+.resultado-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+  padding: 20px;
+}
+
+.resultado-modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+  transform: rotate(90deg);
+}
+
+.resultado-contenido {
+  padding: 2.5rem 2rem;
+}
+
+.resultado-titulo-simple {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0 0 1.5rem 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.puntaje-principal {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  border: 3px solid #0067b1;
+}
+
+.puntaje-numero {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #0067b1;
+  line-height: 1;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.puntaje-clasificacion {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.clasificacion-crecimiento {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.clasificacion-maduracion {
+  background: linear-gradient(135deg, #ffd93d 0%, #f6c23e 100%);
+  color: #664d03;
+  box-shadow: 0 4px 15px rgba(255, 217, 61, 0.4);
+}
+
+.clasificacion-consolidacion {
+  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
+}
+
+.resultado-descripcion {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #0067b1;
+}
+
+.resultado-descripcion p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #495057;
+  margin: 0;
+  text-align: justify;
+}
+
+.resultado-detalles {
+  margin-top: 2rem;
+}
+
+.resultado-detalles h3 {
+  font-size: 1.3rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.pilar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.pilar-item:hover {
+  background: #f8f9fa;
+  border-color: #0067b1;
+  transform: translateX(5px);
+}
+
+.pilar-nombre {
+  font-size: 1rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.pilar-puntaje {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #0067b1;
+  background: #e7f3ff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  min-width: 70px;
+  text-align: center;
+}
+
+.resultado-footer {
+  padding: 1.5rem 2rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-cerrar-resultado {
+  background: linear-gradient(135deg, #0067b1 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 103, 177, 0.3);
+}
+
+.btn-cerrar-resultado:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 103, 177, 0.4);
+}
+
+.btn-cerrar-resultado:active {
+  transform: translateY(0);
+}
+
 .loading-mini {
   width: 12px;
   height: 12px;
@@ -606,6 +903,43 @@ input[type="radio"]:checked {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Responsive para modal de resultado */
+@media (max-width: 768px) {
+  .resultado-modal {
+    border-radius: 12px;
+    max-height: 95vh;
+  }
+
+  .resultado-header {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+  }
+
+  .resultado-titulo {
+    font-size: 1.5rem;
+  }
+
+  .resultado-icon {
+    font-size: 3rem;
+  }
+
+  .resultado-contenido {
+    padding: 1.5rem;
+  }
+
+  .resultado-titulo-simple {
+    font-size: 1.3rem;
+  }
+
+  .puntaje-numero {
+    font-size: 2.5rem;
+  }
+
+  .puntaje-clasificacion {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
 }
 
 /* Estilos para impresión */

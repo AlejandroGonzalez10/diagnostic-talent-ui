@@ -79,7 +79,6 @@ class HttpClient {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('🌐 HTTP: Error del servidor:', errorText)
         
         // Si es error 403 y menciona token, limpiar autenticación y redirigir al login
         if (response.status === 403 && errorText.includes('token')) {
@@ -107,7 +106,6 @@ class HttpClient {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout')
       }
-      console.error('🌐 HTTP: Error en request:', error)
       throw error
     }
   }
@@ -193,7 +191,6 @@ export const questionnaireApi = {
     try {
       return await httpClient.get(ENDPOINTS.QUESTIONNAIRE)
     } catch (error) {
-      console.error('🌐 API: Error en get:', error)
       throw new Error('No se pudieron obtener los datos generales')
     }
   },
@@ -202,7 +199,6 @@ export const questionnaireApi = {
     try {
       return await httpClient.post(ENDPOINTS.QUESTIONNAIRE, data)
     } catch (error) {
-      console.error('🌐 API: Error en submit:', error)
       throw new Error('No se pudieron enviar los datos generales')
     }
   },
@@ -211,7 +207,6 @@ export const questionnaireApi = {
     try {
       return await httpClient.put(ENDPOINTS.QUESTIONNAIRE, data)
     } catch (error) {
-      console.error('🌐 API: Error en update:', error)
       throw new Error('No se pudieron actualizar los datos generales')
     }
   },
@@ -220,7 +215,6 @@ export const questionnaireApi = {
     try {
       return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_ANSWER}/${generalDataId}`)
     } catch (error) {
-      console.error('🌐 API: Error en getAnswers:', error)
       throw new Error('No se pudieron obtener las respuestas')
     }
   },
@@ -229,7 +223,6 @@ export const questionnaireApi = {
     try {
       return await httpClient.post(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
     } catch (error) {
-      console.error('🌐 API: Error en submitAnswer:', error)
       throw new Error('No se pudo enviar la respuesta')
     }
   },
@@ -239,7 +232,6 @@ export const questionnaireApi = {
       // El ID va en el body, no en la URL
       return await httpClient.put(ENDPOINTS.QUESTIONNAIRE_ANSWER, data)
     } catch (error) {
-      console.error('🌐 API: Error en updateAnswer:', error)
       throw new Error('No se pudo actualizar la respuesta')
     }
   }
@@ -251,7 +243,6 @@ export const authApi = {
       const response = await httpClient.post(ENDPOINTS.AUTH, { code })
       return response
     } catch (error) {
-      console.error('🔐 AUTH: Error en autenticación:', error)
       throw new Error('Código de acceso inválido')
     }
   },
@@ -264,8 +255,6 @@ export const authApi = {
       })
       return response
     } catch (error) {
-      console.error('🔐 LOGIN: Error en login:', error)
-      
       // Manejar diferentes tipos de errores
       if (error.message && error.message.includes('401')) {
         throw new Error('Email o contraseña incorrectos')
@@ -283,7 +272,6 @@ export const reportesApi = {
     try {
       return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_REPORT}?page=${page}&pageSize=${pageSize}`)
     } catch (error) {
-      console.error('📊 REPORTES: Error al obtener reportes:', error)
       throw new Error('No se pudieron cargar los reportes')
     }
   }

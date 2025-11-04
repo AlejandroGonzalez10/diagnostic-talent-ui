@@ -132,7 +132,6 @@ export function useCuestionario() {
       
       return null
     } catch (error) {
-      console.error('❌ Error al cargar datos generales:', error)
       return null
     }
   }
@@ -168,7 +167,6 @@ export function useCuestionario() {
       
       return false
     } catch (error) {
-      console.error('❌ Error al cargar respuestas guardadas:', error)
       return false
     }
   }
@@ -179,7 +177,6 @@ export function useCuestionario() {
       error.value = null
       categorias.value = await categoriesApi.getAll()
     } catch (err) {
-      console.error('❌ Error al cargar categorías:', err)
       error.value = err.message
     } finally {
       isLoading.value = false
@@ -213,7 +210,6 @@ export function useCuestionario() {
       // Cargar datos guardados
       cargarDatosGuardados()
     } catch (err) {
-      console.error('❌ Error al cargar preguntas:', err)
       error.value = err.message
     } finally {
       isLoading.value = false
@@ -289,50 +285,44 @@ export function useCuestionario() {
 
   // 🔧 Función auxiliar para enviar datos de respuesta (CON CONTROL DE DUPLICADOS)
   const enviarRespuestaDatos = async (datosRespuesta) => {
-    try {
-      // Usar sessionStorage con clave que incluya general_data_id para que sea única por formulario
-      const claveRegistro = `respuesta_${datosRespuesta.general_data_id}_${datosRespuesta.category_id}_${datosRespuesta.question_id}`
-      const registroId = sessionStorage.getItem(claveRegistro)
+    // Usar sessionStorage con clave que incluya general_data_id para que sea única por formulario
+    const claveRegistro = `respuesta_${datosRespuesta.general_data_id}_${datosRespuesta.category_id}_${datosRespuesta.question_id}`
+    const registroId = sessionStorage.getItem(claveRegistro)
+    
+    if (registroId) {
+      // Ya existe un registro, actualizar usando el ID guardado
+      datosRespuesta.id = parseInt(registroId)
       
-      if (registroId) {
-        // Ya existe un registro, actualizar usando el ID guardado
-        datosRespuesta.id = parseInt(registroId)
-        
-        try {
-          await cuestionarioApi.actualizarRespuesta(datosRespuesta)
-        } catch (updateError) {
-          console.error('❌ Error al actualizar, intentando crear nueva:', updateError)
-          // Si falla el PUT, intentar POST
-          const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          if (resultado && resultado.id) {
-            sessionStorage.setItem(claveRegistro, resultado.id.toString())
-          }
-        }
-      } else {
-        // Primera vez enviando esta respuesta para esta combinación
-        try {
-          const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
-          
-          // Intentar varias formas de obtener el ID
-          let idRespuesta = null
-          if (resultado) {
-            idRespuesta = resultado.id || resultado.ID || resultado.answer_id || resultado.answerId
-            
-            if (!idRespuesta && resultado.data) {
-              idRespuesta = resultado.data.id || resultado.data.ID || resultado.data.answer_id
-            }
-          }
-          
-          if (idRespuesta) {
-            sessionStorage.setItem(claveRegistro, idRespuesta.toString())
-          }
-        } catch (error) {
-          console.error('❌ Error al enviar respuesta:', error)
+      try {
+        await cuestionarioApi.actualizarRespuesta(datosRespuesta)
+      } catch (updateError) {
+        // Si falla el PUT, intentar POST
+        const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
+        if (resultado && resultado.id) {
+          sessionStorage.setItem(claveRegistro, resultado.id.toString())
         }
       }
-    } catch (error) {
-      console.error('❌ Error al enviar respuesta al servidor:', error)
-      throw error
+    } else {
+      // Primera vez enviando esta respuesta para esta combinación
+      try {
+        const resultado = await cuestionarioApi.enviarRespuesta(datosRespuesta)
+        
+        // Intentar varias formas de obtener el ID
+        let idRespuesta = null
+        if (resultado) {
+          idRespuesta = resultado.id || resultado.ID || resultado.answer_id || resultado.answerId
+          
+          if (!idRespuesta && resultado.data) {
+            idRespuesta = resultado.data.id || resultado.data.ID || resultado.data.answer_id
+          }
+        }
+        
+        if (idRespuesta) {
+          sessionStorage.setItem(claveRegistro, idRespuesta.toString())
+        }
+      } catch (error) {
+        // Error al enviar respuesta
+      }
     }
   }
 
@@ -424,11 +414,11 @@ export function useCuestionario() {
             sessionStorage.setItem(claveRegistro, idRespuesta.toString())
           }
         } catch (error) {
-          console.error('❌ Error al enviar respuesta:', error)
+          // Error al enviar respuesta
         }
       }
     } catch (error) {
-      console.error('❌ Error al enviar/actualizar respuesta:', error)
+      // Error al enviar/actualizar respuesta
     }
   }
 
