@@ -99,7 +99,7 @@
         </div>
 
         <div class="resultado-footer">
-          <button @click="cerrarModalResultado" class="btn-cerrar-resultado">Cerrar</button>
+          <button @click="cerrarModalResultado" class="btn-cerrar-resultado">Aceptar</button>
         </div>
       </div>
     </div>
@@ -757,9 +757,6 @@ input[type="radio"]:checked {
   text-align: center;
   margin-bottom: 2rem;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 16px;
-  border: 3px solid #0067b1;
 }
 
 .puntaje-numero {
@@ -768,7 +765,6 @@ input[type="radio"]:checked {
   color: #0067b1;
   line-height: 1;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .puntaje-clasificacion {
@@ -776,28 +772,21 @@ input[type="radio"]:checked {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  padding: 0.6rem 1.2rem;
-  border-radius: 50px;
   display: inline-block;
   margin-top: 0.5rem;
+  color: #0067b1;
 }
 
 .clasificacion-crecimiento {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  color: #0067b1;
 }
 
 .clasificacion-maduracion {
-  background: linear-gradient(135deg, #ffd93d 0%, #f6c23e 100%);
-  color: #664d03;
-  box-shadow: 0 4px 15px rgba(255, 217, 61, 0.4);
+  color: #0067b1;
 }
 
 .clasificacion-consolidacion {
-  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
+  color: #0067b1;
 }
 
 .resultado-descripcion {

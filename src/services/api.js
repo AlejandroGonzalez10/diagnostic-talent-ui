@@ -143,6 +143,7 @@ const ENDPOINTS = {
   CATEGORIES: '/quiestionaire/categories',
   QUESTIONS: '/quiestionaire/questions',
   OPTIONS: '/quiestionaire/options',
+  SECTORS: '/quiestionaire/sectors',
   QUESTIONNAIRE: '/quiestionaire',
   QUESTIONNAIRE_ANSWER: '/quiestionaire/answer',
   QUESTIONNAIRE_REPORT: '/quiestionaire/report'
@@ -182,6 +183,16 @@ export const optionsApi = {
       return await httpClient.get(ENDPOINTS.OPTIONS)
     } catch (error) {
       throw new Error('No se pudieron cargar las opciones de respuesta')
+    }
+  }
+}
+
+export const sectorsApi = {
+  async getAll() {
+    try {
+      return await httpClient.get(ENDPOINTS.SECTORS)
+    } catch (error) {
+      throw new Error('No se pudieron cargar los sectores')
     }
   }
 }
@@ -292,6 +303,10 @@ export const cuestionarioApi = {
 
   async obtenerOpciones() {
     return optionsApi.getAll()
+  },
+
+  async obtenerSectores() {
+    return sectorsApi.getAll()
   },
 
   async obtenerDatosGenerales() {

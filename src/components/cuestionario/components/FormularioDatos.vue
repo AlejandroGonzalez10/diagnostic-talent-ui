@@ -45,16 +45,9 @@
               required
             >
               <option value="" disabled>Seleccione un sector</option>
-              <option value="Tecnología">Tecnología</option>
-              <option value="Financiero">Financiero</option>
-              <option value="Salud">Salud</option>
-              <option value="Educación">Educación</option>
-              <option value="Manufactura">Manufactura</option>
-              <option value="Retail">Retail</option>
-              <option value="Construcción">Construcción</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Servicios">Servicios</option>
-              <option value="Otro">Otro</option>
+              <option v-for="sector in sectores" :key="sector.SECId" :value="sector.SECNombre">
+                {{ sector.SECNombre }}
+              </option>
             </select>
             <p class="valor-para-pdf">{{ datosLocales.sector || 'No especificado' }}</p>
           </div>
@@ -164,6 +157,7 @@ export default {
     const { generalDataId, setGeneralDataId, cargarDatosGenerales } = useCuestionario()
     
     const datosLocales = ref({ ...props.datosIniciales })
+    const sectores = ref([])
     const errores = ref({
       entidad: false,
       nit: false,
@@ -303,13 +297,26 @@ export default {
       emit('validacion-cambio', todosCompletos)
     }
 
+    // Cargar sectores desde el API
+    const cargarSectores = async () => {
+      try {
+        const sectoresData = await cuestionarioApi.obtenerSectores()
+        sectores.value = sectoresData || []
+      } catch (error) {
+        // Si falla, usar lista vacía
+        sectores.value = []
+      }
+    }
+
     // Inicializar datos al montar el componente
-    onMounted(() => {
+    onMounted(async () => {
+      await cargarSectores()
       inicializarDatos()
     })
 
     return {
       datosLocales,
+      sectores,
       errores,
       enviandoDatos,
       actualizarCampo
