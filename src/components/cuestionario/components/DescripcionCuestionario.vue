@@ -7,7 +7,7 @@
         actividades para la gestión del talento se convierten en un aspecto clave para alinear la
         planeación de personas con las metas del negocio.</p>
       
-      <p>Con este <strong>Diagnóstico digital de entorno laboral</strong> y los <strong>5 pilares de análisis</strong>, se busca
+      <p>Con este <strong>Diagnóstico digital de entorno laboral y los 5 pilares de análisis</strong>, se busca
         ofrecer una herramienta práctica y estructurada que permita por un lado, identificar brechas
         en políticas, procesos y prácticas de gestión que impacten la atracción, desarrollo y
         retención del capital humano; además de evaluar la efectividad en la estructuración de
