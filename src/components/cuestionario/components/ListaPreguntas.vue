@@ -107,8 +107,18 @@
                   <span class="loading-mini"></span>
                   <span class="loading-text">Cargando análisis...</span>
                 </div>
-                <div v-else class="pilar-descripcion">
-                  {{ insightsPorPilar[categoria.id] || 'Seleccione un sector para ver el análisis.' }}
+                <div v-else>
+                  <div class="pilar-descripcion">
+                    {{ insightsPorPilar[categoria.id]?.descripcion || 'Seleccione un sector para ver el análisis.' }}
+                  </div>
+                  <a v-if="insightsPorPilar[categoria.id]?.link" 
+                     :href="insightsPorPilar[categoria.id].link" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     class="pilar-link">
+                    <span class="link-icon">🔗</span>
+                    Ver más información
+                  </a>
                 </div>
               </div>
             </div>
@@ -416,13 +426,23 @@ export default {
         const response = await researchApi.generarInsight(categoriaId, this.sector)
         
         if (response && response.descripcion_capsula) {
-          this.insightsPorPilar[categoriaId] = response.descripcion_capsula
+          // Guardar tanto la descripción como el link
+          this.insightsPorPilar[categoriaId] = {
+            descripcion: response.descripcion_capsula,
+            link: response.link_referencia || null
+          }
         } else {
-          this.insightsPorPilar[categoriaId] = 'No se pudo obtener información para este pilar.'
+          this.insightsPorPilar[categoriaId] = {
+            descripcion: 'No se pudo obtener información para este pilar.',
+            link: null
+          }
         }
       } catch (error) {
         console.error(`Error cargando insight para pilar ${categoriaId}:`, error.message)
-        this.insightsPorPilar[categoriaId] = 'No se pudo obtener información para este pilar.'
+        this.insightsPorPilar[categoriaId] = {
+          descripcion: 'No se pudo obtener información para este pilar.',
+          link: null
+        }
       } finally {
         this.cargandoInsights[categoriaId] = false
       }
@@ -928,6 +948,33 @@ input[type="radio"]:checked {
   color: #495057;
   line-height: 1.6;
   text-align: justify;
+  margin-bottom: 1rem;
+}
+
+.pilar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0067b1;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid #0067b1;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.pilar-link:hover {
+  background: #0067b1;
+  color: white;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 103, 177, 0.2);
+}
+
+.link-icon {
+  font-size: 1rem;
 }
 
 .pilar-cargando {

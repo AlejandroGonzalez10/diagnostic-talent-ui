@@ -8,7 +8,7 @@ const API_CONFIG = {
 
 const RESEARCH_API_CONFIG = {
   baseURL: process.env.VUE_APP_RESEARCH_API_URL,
-  timeout: 120000, // 2 minutos para investigación (puede tardar mucho)
+  timeout: 180000, // 3 minutos para investigación (puede tardar mucho)
   headers: {
     'Content-Type': 'application/json',
   }
