@@ -97,10 +97,10 @@
             <p v-html="getDescripcionResultado()"></p>
           </div>
 
-          <!-- Detalles por pilar -->
-          <div class="resultado-detalles">
+          <!-- Detalles por pilar (solo pilares con promedio <= 2) -->
+          <div class="resultado-detalles" v-if="pilaresBajos.length > 0">
             <h3>Análisis por Pilar</h3>
-            <div v-for="categoria in categorias" :key="categoria.id" class="pilar-item">
+            <div v-for="categoria in pilaresBajos" :key="categoria.id" class="pilar-item">
               <div class="pilar-info">
                 <div class="pilar-nombre">{{ categoria.name }}</div>
                 <div v-if="cargandoInsights[categoria.id]" class="pilar-cargando">
@@ -109,7 +109,7 @@
                 </div>
                 <div v-else>
                   <div class="pilar-descripcion">
-                    {{ insightsPorPilar[categoria.id]?.descripcion || 'Seleccione un sector para ver el análisis.' }}
+                    {{ insightsPorPilar[categoria.id]?.descripcion || 'Cargando información del pilar...' }}
                   </div>
                   <a v-if="insightsPorPilar[categoria.id]?.link" 
                      :href="insightsPorPilar[categoria.id].link" 
@@ -121,6 +121,15 @@
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          <!-- Mensaje si no hay pilares bajos -->
+          <div v-else class="sin-pilares-bajos">
+            <div class="mensaje-excelente">
+              <span class="icono-excelente">🎉</span>
+              <h3>¡Excelente Desempeño!</h3>
+              <p>Todos los pilares tienen una puntuación superior a 2.00. La organización muestra fortalezas consistentes en todas las áreas evaluadas.</p>
             </div>
           </div>
         </div>
@@ -185,37 +194,63 @@ export default {
       cargandoInsights: {}
     }
   },
+  computed: {
+    pilaresBajos() {
+      // Filtrar pilares con promedio <= 2
+      return this.categorias.filter(categoria => {
+        const preguntas = this.preguntasPorCategoria[categoria.id] || []
+        
+        // Solo considerar pilares completamente respondidos
+        const todasRespondidas = preguntas.every(p => this.respuestasLocales[p.id])
+        if (!todasRespondidas) return false
+        
+        const promedio = parseFloat(this.calcularPuntajeCategoria(categoria.id))
+        return promedio <= 2
+      })
+    }
+  },
   watch: {
     respuestas: {
-      handler(newVal) {
+      handler(newVal, oldVal) {
         this.respuestasLocales = { ...newVal }
+        
+        // Si es la primera carga (oldVal vacío) y hay datos precargados
+        if (oldVal && Object.keys(oldVal).length === 0 && Object.keys(newVal).length > 0) {
+          // Verificar pilares completos cuando se cargan datos iniciales
+          this.$nextTick(() => {
+            this.verificarPilaresCompletosIniciales()
+          })
+        }
       },
       immediate: true,
       deep: true
     },
     sector: {
-      handler(newSector) {
-        if (newSector && this.categorias.length > 0) {
-          this.cargarTodosLosInsights()
+      handler(newSector, oldSector) {
+        // Solo recargar si cambió el sector y ya hay respuestas
+        if (newSector && oldSector && newSector !== oldSector && this.categorias.length > 0) {
+          this.cargarInsightsPilaresBajos()
+        } else if (newSector && !oldSector && this.categorias.length > 0 && Object.keys(this.respuestasLocales).length > 0) {
+          // Caso de carga inicial con sector y respuestas precargadas
+          this.$nextTick(() => {
+            this.verificarPilaresCompletosIniciales()
+          })
         }
-      },
-      immediate: true
+      }
     },
     categorias: {
-      handler(newCategorias) {
-        if (newCategorias.length > 0 && this.sector) {
-          this.cargarTodosLosInsights()
+      handler(newCategorias, oldCategorias) {
+        // Solo ejecutar cuando se cargan las categorías por primera vez
+        if (newCategorias.length > 0 && (!oldCategorias || oldCategorias.length === 0)) {
+          if (this.sector && Object.keys(this.respuestasLocales).length > 0) {
+            // Hay datos precargados, verificar pilares completos
+            this.$nextTick(() => {
+              this.verificarPilaresCompletosIniciales()
+            })
+          }
         }
       },
       immediate: true
-    }
-  },
-  created() {
-    // Component created
-  },
-  mounted() {
-    if (this.sector && this.categorias.length > 0) {
-      this.cargarTodosLosInsights()
     }
   },
   methods: {
@@ -306,6 +341,9 @@ export default {
       
       // Mantener la funcionalidad existente
       this.emitirCambios()
+      
+      // Verificar si se completó un pilar para cargar su insight
+      this.verificarPilarCompletado(preguntaId)
     },
     emitirCambios() {
       this.$emit('update:respuestas', this.respuestasLocales)
@@ -406,11 +444,67 @@ export default {
       }
       return 'Complete el diagnóstico para obtener una clasificación.'
     },
-    async cargarTodosLosInsights() {
+    verificarPilarCompletado(preguntaId) {
+      // Encontrar a qué pilar pertenece esta pregunta
+      for (const categoria of this.categorias) {
+        const preguntas = this.preguntasPorCategoria[categoria.id] || []
+        const perteneceAPilar = preguntas.some(p => p.id === preguntaId)
+        
+        if (perteneceAPilar) {
+          // Verificar si todas las preguntas del pilar están respondidas
+          const todasRespondidas = preguntas.every(p => this.respuestasLocales[p.id])
+          
+          if (todasRespondidas) {
+            const promedio = parseFloat(this.calcularPuntajeCategoria(categoria.id))
+            
+            // Si el promedio es <= 2 y aún no se ha cargado el insight
+            if (promedio <= 2 && !this.insightsPorPilar[categoria.id] && this.sector) {
+              this.cargarInsightPilar(categoria.id)
+            }
+          }
+          break
+        }
+      }
+    },
+    verificarPilaresCompletosIniciales() {
+      // Verificar todos los pilares que estén completos en la carga inicial
+      if (!this.sector || this.categorias.length === 0) return
+
+      this.categorias.forEach(categoria => {
+        const preguntas = this.preguntasPorCategoria[categoria.id] || []
+        
+        if (preguntas.length === 0) return
+
+        // Verificar si todas las preguntas del pilar están respondidas
+        const todasRespondidas = preguntas.every(p => this.respuestasLocales[p.id])
+        
+        if (todasRespondidas) {
+          const promedio = parseFloat(this.calcularPuntajeCategoria(categoria.id))
+          
+          // Si el promedio es <= 2 y aún no se ha cargado el insight
+          if (promedio <= 2 && !this.insightsPorPilar[categoria.id]) {
+            this.cargarInsightPilar(categoria.id)
+          }
+        }
+      })
+    },
+    async cargarInsightsPilaresBajos() {
       if (!this.sector) return
 
-      // Cargar insights en paralelo para todas las categorías
-      const promesas = this.categorias.map(categoria => 
+      // Filtrar solo los pilares con promedio <= 2
+      const pilaresBajos = this.categorias.filter(categoria => {
+        const preguntas = this.preguntasPorCategoria[categoria.id] || []
+        
+        // Solo considerar pilares completamente respondidos
+        const todasRespondidas = preguntas.every(p => this.respuestasLocales[p.id])
+        if (!todasRespondidas) return false
+        
+        const promedio = parseFloat(this.calcularPuntajeCategoria(categoria.id))
+        return promedio <= 2
+      })
+
+      // Cargar insights solo para pilares con promedio bajo
+      const promesas = pilaresBajos.map(categoria => 
         this.cargarInsightPilar(categoria.id)
       )
 
@@ -917,6 +1011,40 @@ input[type="radio"]:checked {
   border-bottom: 2px solid #e9ecef;
 }
 
+.sin-pilares-bajos {
+  padding: 2rem;
+  text-align: center;
+}
+
+.mensaje-excelente {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 2px solid #28a745;
+  border-radius: 12px;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.icono-excelente {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.mensaje-excelente h3 {
+  color: #155724;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border: none;
+  padding: 0;
+}
+
+.mensaje-excelente p {
+  color: #155724;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
 .pilar-item {
   padding: 1.5rem;
   margin-bottom: 1rem;
@@ -1074,6 +1202,18 @@ input[type="radio"]:checked {
   .puntaje-clasificacion {
     font-size: 1.1rem;
     letter-spacing: 1px;
+  }
+  
+  .mensaje-excelente {
+    padding: 1.5rem;
+  }
+  
+  .icono-excelente {
+    font-size: 2.5rem;
+  }
+  
+  .mensaje-excelente h3 {
+    font-size: 1.2rem;
   }
 }
 

@@ -169,9 +169,7 @@ export default {
     })
 
     const onSectorCambio = (sector) => {
-      console.log('onSectorCambio recibido en Cuestionario:', sector)
       sectorSeleccionado.value = sector
-      console.log('sectorSeleccionado actualizado a:', sectorSeleccionado.value)
     }
 
     return {

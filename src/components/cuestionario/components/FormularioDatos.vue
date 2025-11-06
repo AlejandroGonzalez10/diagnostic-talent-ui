@@ -204,7 +204,6 @@ export default {
           
           // Emitir sector-cambio si hay sector guardado
           if (datosExistentes.sector) {
-            console.log('Emitiendo sector-cambio desde datos cargados:', datosExistentes.sector)
             emit('sector-cambio', datosExistentes.sector)
           }
           
@@ -239,8 +238,6 @@ export default {
     }
 
     const actualizarCampo = async (campo) => {
-      console.log('actualizarCampo llamado:', campo, 'valor:', datosLocales.value[campo])
-      
       if (!registroCreado.value) {
         await crearRegistroInicial()
       }
@@ -260,7 +257,6 @@ export default {
 
       // Si es el sector, emitir evento de cambio de sector SIEMPRE (incluso si está vacío)
       if (campo === 'sector') {
-        console.log('Emitiendo sector-cambio:', valor)
         emit('sector-cambio', valor)
       }
 
