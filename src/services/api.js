@@ -1,20 +1,10 @@
 const API_CONFIG = {
   baseURL: process.env.NODE_ENV === 'development' ? '/api' : (process.env.VUE_APP_API_URL || '/api'),
-  timeout: 10000,
+  timeout: 180000,
   headers: {
     'Content-Type': 'application/json',
   }
 }
-
-const RESEARCH_API_CONFIG = {
-  baseURL: process.env.VUE_APP_RESEARCH_API_URL,
-  timeout: 180000, // 3 minutos para investigación (puede tardar mucho)
-  headers: {
-    'Content-Type': 'application/json',
-  }
-}
-
-console.log('🔧 RESEARCH_API_CONFIG.baseURL:', RESEARCH_API_CONFIG.baseURL)
 
 class HttpClient {
   constructor(config) {
@@ -146,7 +136,6 @@ class HttpClient {
 }
 
 const httpClient = new HttpClient(API_CONFIG)
-const researchClient = new HttpClient(RESEARCH_API_CONFIG)
 
 const ENDPOINTS = {
   AUTH: '/users/auth',
@@ -157,7 +146,8 @@ const ENDPOINTS = {
   SECTORS: '/quiestionaire/sectors',
   QUESTIONNAIRE: '/quiestionaire',
   QUESTIONNAIRE_ANSWER: '/quiestionaire/answer',
-  QUESTIONNAIRE_REPORT: '/quiestionaire/report'
+  QUESTIONNAIRE_REPORT: '/quiestionaire/report',
+  QUESTIONNAIRE_AI: '/quiestionaire/ai-research'
 }
 
 export const categoriesApi = {
@@ -302,7 +292,7 @@ export const reportesApi = {
 export const researchApi = {
   async generarInsight(pilar, sector) {
     try {
-      return await researchClient.post('/v1/research/generate-insight', {
+      return await httpClient.post(ENDPOINTS.QUESTIONNAIRE_AI, {
         pilar: pilar,
         sector: sector
       })

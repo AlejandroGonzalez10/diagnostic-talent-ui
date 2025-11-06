@@ -15,13 +15,6 @@ module.exports = defineConfig({
         pathRewrite: {
           '^/api': ''
         }
-      },
-      '/research-api': {
-        target: 'http://web_research.ankora.com.co',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/research-api': '/api'
-        }
       }
     }
   }

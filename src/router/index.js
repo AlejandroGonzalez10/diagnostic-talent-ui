@@ -27,8 +27,7 @@ const routes = [
     component: LoginView,
     meta: {
       title: 'Iniciar Sesión',
-      requiresAuth: false,
-      hideForAuthenticated: true // Ocultar si ya está autenticado
+      requiresAuth: false
     }
   },
   {
