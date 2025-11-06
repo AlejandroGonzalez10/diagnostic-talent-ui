@@ -96,6 +96,23 @@
           <div class="resultado-descripcion">
             <p v-html="getDescripcionResultado()"></p>
           </div>
+
+          <!-- Detalles por pilar -->
+          <div class="resultado-detalles">
+            <h3>Análisis por Pilar</h3>
+            <div v-for="categoria in categorias" :key="categoria.id" class="pilar-item">
+              <div class="pilar-info">
+                <div class="pilar-nombre">{{ categoria.name }}</div>
+                <div v-if="cargandoInsights[categoria.id]" class="pilar-cargando">
+                  <span class="loading-mini"></span>
+                  <span class="loading-text">Cargando análisis...</span>
+                </div>
+                <div v-else class="pilar-descripcion">
+                  {{ insightsPorPilar[categoria.id] || 'Seleccione un sector para ver el análisis.' }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="resultado-footer">
@@ -107,6 +124,8 @@
 </template>
 
 <script>
+import { researchApi } from '@/services/api'
+
 export default {
   name: 'QuestionList',
   props: {
@@ -136,6 +155,10 @@ export default {
     datosCompletos: {
       type: Boolean,
       default: false
+    },
+    sector: {
+      type: String,
+      default: ''
     }
   },
   emits: ['update:respuestas', 'respuestas-cambio'],
@@ -147,7 +170,9 @@ export default {
       mostrarModalResultado: false,
       alertaTitulo: '',
       alertaMensaje: '',
-      alertaSubmensaje: ''
+      alertaSubmensaje: '',
+      insightsPorPilar: {},
+      cargandoInsights: {}
     }
   },
   watch: {
@@ -157,6 +182,30 @@ export default {
       },
       immediate: true,
       deep: true
+    },
+    sector: {
+      handler(newSector) {
+        if (newSector && this.categorias.length > 0) {
+          this.cargarTodosLosInsights()
+        }
+      },
+      immediate: true
+    },
+    categorias: {
+      handler(newCategorias) {
+        if (newCategorias.length > 0 && this.sector) {
+          this.cargarTodosLosInsights()
+        }
+      },
+      immediate: true
+    }
+  },
+  created() {
+    // Component created
+  },
+  mounted() {
+    if (this.sector && this.categorias.length > 0) {
+      this.cargarTodosLosInsights()
     }
   },
   methods: {
@@ -346,6 +395,37 @@ export default {
         return '<strong>La organización se encuentra en una etapa de madurez que le permite fortalecer su enfoque en innovación, analítica y experiencia del colaborador.</strong><br>Se recomienda consolidar estas capacidades integrándolas en la estrategia de talento, promoviendo una cultura de mejora continua y utilizando los datos para potenciar el bienestar y el desempeño del equipo.'
       }
       return 'Complete el diagnóstico para obtener una clasificación.'
+    },
+    async cargarTodosLosInsights() {
+      if (!this.sector) return
+
+      // Cargar insights en paralelo para todas las categorías
+      const promesas = this.categorias.map(categoria => 
+        this.cargarInsightPilar(categoria.id)
+      )
+
+      await Promise.allSettled(promesas)
+    },
+    async cargarInsightPilar(categoriaId) {
+      if (!this.sector) return
+
+      // Marcar como cargando
+      this.cargandoInsights[categoriaId] = true
+
+      try {
+        const response = await researchApi.generarInsight(categoriaId, this.sector)
+        
+        if (response && response.descripcion_capsula) {
+          this.insightsPorPilar[categoriaId] = response.descripcion_capsula
+        } else {
+          this.insightsPorPilar[categoriaId] = 'No se pudo obtener información para este pilar.'
+        }
+      } catch (error) {
+        console.error(`Error cargando insight para pilar ${categoriaId}:`, error.message)
+        this.insightsPorPilar[categoriaId] = 'No se pudo obtener información para este pilar.'
+      } finally {
+        this.cargandoInsights[categoriaId] = false
+      }
     }
   }
 }
@@ -812,17 +892,14 @@ input[type="radio"]:checked {
 .resultado-detalles h3 {
   font-size: 1.3rem;
   color: #2c3e50;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #e9ecef;
 }
 
 .pilar-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  margin-bottom: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
   background: white;
   border: 1px solid #e9ecef;
   border-radius: 10px;
@@ -832,24 +909,46 @@ input[type="radio"]:checked {
 .pilar-item:hover {
   background: #f8f9fa;
   border-color: #0067b1;
-  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 103, 177, 0.1);
+}
+
+.pilar-info {
+  width: 100%;
 }
 
 .pilar-nombre {
-  font-size: 1rem;
-  color: #495057;
-  font-weight: 500;
+  font-size: 1.1rem;
+  color: #0067b1;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
-.pilar-puntaje {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #0067b1;
-  background: #e7f3ff;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  min-width: 70px;
-  text-align: center;
+.pilar-descripcion {
+  font-size: 0.95rem;
+  color: #495057;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.pilar-cargando {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.pilar-cargando .loading-mini {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e0e0e0;
+  border-top: 2px solid #0067b1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-style: italic;
 }
 
 .resultado-footer {

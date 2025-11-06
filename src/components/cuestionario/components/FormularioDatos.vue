@@ -40,7 +40,7 @@
               id="sector"
               v-model="datosLocales.sector"
               :class="{ 'error': errores.sector }"
-              @blur="actualizarCampo('sector')"
+              @change="actualizarCampo('sector')"
               class="ocultar-input-en-pdf"
               required
             >
@@ -151,7 +151,7 @@ export default {
       })
     }
   },
-  emits: ['update:datos', 'validacion-cambio', 'datos-enviados'],
+  emits: ['update:datos', 'validacion-cambio', 'datos-enviados', 'sector-cambio'],
   setup(props, { emit }) {
     const { validarEmail } = useValidacion()
     const { generalDataId, setGeneralDataId, cargarDatosGenerales } = useCuestionario()
@@ -201,6 +201,13 @@ export default {
           registroCreado.value = true
           emit('datos-enviados', datosExistentes.id)
           emit('update:datos', datosLocales.value)
+          
+          // Emitir sector-cambio si hay sector guardado
+          if (datosExistentes.sector) {
+            console.log('Emitiendo sector-cambio desde datos cargados:', datosExistentes.sector)
+            emit('sector-cambio', datosExistentes.sector)
+          }
+          
           validarFormulario()
         } else {
           // Si no hay datos existentes, crear un nuevo registro
@@ -232,6 +239,8 @@ export default {
     }
 
     const actualizarCampo = async (campo) => {
+      console.log('actualizarCampo llamado:', campo, 'valor:', datosLocales.value[campo])
+      
       if (!registroCreado.value) {
         await crearRegistroInicial()
       }
@@ -247,6 +256,12 @@ export default {
         errores.value[campo] = valor.length > 0 ? !validarEmail(valor) : false
       } else {
         errores.value[campo] = false
+      }
+
+      // Si es el sector, emitir evento de cambio de sector SIEMPRE (incluso si está vacío)
+      if (campo === 'sector') {
+        console.log('Emitiendo sector-cambio:', valor)
+        emit('sector-cambio', valor)
       }
 
       // Si el campo está vacío, no enviar actualización

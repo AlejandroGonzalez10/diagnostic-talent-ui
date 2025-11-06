@@ -6,6 +6,16 @@ const API_CONFIG = {
   }
 }
 
+const RESEARCH_API_CONFIG = {
+  baseURL: process.env.VUE_APP_RESEARCH_API_URL,
+  timeout: 120000, // 2 minutos para investigación (puede tardar mucho)
+  headers: {
+    'Content-Type': 'application/json',
+  }
+}
+
+console.log('🔧 RESEARCH_API_CONFIG.baseURL:', RESEARCH_API_CONFIG.baseURL)
+
 class HttpClient {
   constructor(config) {
     this.baseURL = config.baseURL
@@ -136,6 +146,7 @@ class HttpClient {
 }
 
 const httpClient = new HttpClient(API_CONFIG)
+const researchClient = new HttpClient(RESEARCH_API_CONFIG)
 
 const ENDPOINTS = {
   AUTH: '/users/auth',
@@ -284,6 +295,19 @@ export const reportesApi = {
       return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_REPORT}?page=${page}&pageSize=${pageSize}`)
     } catch (error) {
       throw new Error('No se pudieron cargar los reportes')
+    }
+  }
+}
+
+export const researchApi = {
+  async generarInsight(pilar, sector) {
+    try {
+      return await researchClient.post('/v1/research/generate-insight', {
+        pilar: pilar,
+        sector: sector
+      })
+    } catch (error) {
+      throw new Error(`No se pudo generar el insight: ${error.message}`)
     }
   }
 }

@@ -27,6 +27,7 @@
           v-model:datos="datosUsuario"
           @validacion-cambio="datosValidos = $event"
           @datos-enviados="onDatosEnviados"
+          @sector-cambio="onSectorCambio"
         />
 
         <lista-preguntas
@@ -38,6 +39,7 @@
           @respuestas-cambio="validarRespuestas"
           :guardar-respuesta="guardarRespuesta"
           :datos-completos="datosValidos"
+          :sector="sectorSeleccionado"
         />
       </div>
     </div>
@@ -97,6 +99,7 @@ export default {
     })
     const datosValidos = ref(false)
     const pendienteCargarRespuestas = ref(null)
+    const sectorSeleccionado = ref('')
 
     const iniciarCuestionario = (authData) => {
       // Guardar datos de autenticación
@@ -165,6 +168,12 @@ export default {
       }
     })
 
+    const onSectorCambio = (sector) => {
+      console.log('onSectorCambio recibido en Cuestionario:', sector)
+      sectorSeleccionado.value = sector
+      console.log('sectorSeleccionado actualizado a:', sectorSeleccionado.value)
+    }
+
     return {
       codigoValidado,
       isLoading,
@@ -177,6 +186,8 @@ export default {
       formularioCompleto,
       opciones,
       token,
+      sectorSeleccionado,
+      onSectorCambio,
       usuario,
       isAuthenticated,
       iniciarCuestionario,
