@@ -51,17 +51,6 @@ body,html {
   object-fit: contain;
 }
 
-.title-banner{
-  color: #f4f4f4 !important;
-  background-color: #0067B1;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.primary-title{
-  color: #0067b1 !important;
-}
-
 @media (max-width: 768px) {
   .cuestionario-container{
     padding: 5px 15px;

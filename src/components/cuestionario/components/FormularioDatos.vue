@@ -1,10 +1,10 @@
 <template>
   <section class="datos-iniciales">
-    <h2 class="datos-iniciales-titulo title-banner">Datos Iniciales</h2>
+    <h2 class="datos-iniciales-titulo title-datos-iniciales">Datos Iniciales</h2>
     <div class="datos-section">
       <!-- Datos de la empresa -->
       <div class="datos-subsection">
-        <h3 class="primary-title">Datos de la empresa</h3>
+        <h3 class="primary-title-datos">Datos de la empresa</h3>
         <div class="datos-grid">
           <div class="form-group">
             <label for="entidadEjecutora">Nombre de la empresa</label>
@@ -70,7 +70,7 @@
 
       <!-- Datos de contacto -->
       <div class="datos-subsection">
-        <h3 class="primary-title">Datos de contacto</h3>
+        <h3 class="primary-title-datos">Datos de contacto</h3>
         <div class="datos-grid">
           <div class="form-group">
             <label for="nombre">Nombre completo de quien diligencia</label>
@@ -338,6 +338,18 @@ export default {
 
 <style scoped>
 @import '../styles/formulario-datos.scss';
+
+.title-datos-iniciales {
+  background-color: #262626;
+  color: #F2B705;
+  padding: 2rem;
+  text-align: center;
+}
+
+.primary-title-datos {
+  color: #F2B705;
+  margin-bottom: 1.5rem;
+}
 
 /* Ocultar valores en pantalla normal */
 .valor-para-pdf {

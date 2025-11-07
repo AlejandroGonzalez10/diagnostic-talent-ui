@@ -562,11 +562,6 @@ export default {
   color: #2c3e50;
 }
 
-.categoria-descripcion {
-  margin-bottom: 0.5rem;
-  color: #fff;
-}
-
 .categoria-meta {
   font-size: 0.9rem;
   color: #666;

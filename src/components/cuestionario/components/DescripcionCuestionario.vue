@@ -1,21 +1,23 @@
 <template>
   <div class="form-header">
-    <h2 class="title-banner">Diagnóstico digital de entorno laboral</h2>
-    <div class="descripcion-diagnostico">
-      <p>La gestión estratégica del talento humano es un pilar fundamental para garantizar la
-        sostenibilidad, competitividad e innovación de las organizaciones. En este contexto, las
-        actividades para la gestión del talento se convierten en un aspecto clave para alinear la
-        planeación de personas con las metas del negocio.</p>
-      
-      <p>Con este <strong>Diagnóstico digital de entorno laboral y los 5 pilares de análisis</strong>, se busca
-        ofrecer una herramienta práctica y estructurada que permita por un lado, identificar brechas
-        en políticas, procesos y prácticas de gestión que impacten la atracción, desarrollo y
-        retención del capital humano; además de evaluar la efectividad en la estructuración de
-        vacantes tácticas y estratégicas.</p>
-      
-      <p>Este diagnóstico no constituye una evaluación de personas, sino un <strong>instrumento de
-        autogestión para la empresa</strong>. No debe interpretarse como un análisis profundo y detallado
-        de la situación actual de la compañía, es un ejercicio orientativo.</p>
+    <div class="header-section">
+      <h1 class="title-banner">Diagnóstico digital de entorno laboral</h1>
+      <div class="descripcion-diagnostico">
+        <p>La gestión estratégica del talento humano es un pilar fundamental para garantizar la
+          sostenibilidad, competitividad e innovación de las organizaciones. En este contexto, las
+          actividades para la gestión del talento se convierten en un aspecto clave para alinear la
+          planeación de personas con las metas del negocio.</p>
+        
+        <p>Con este <strong>Diagnóstico digital de entorno laboral y los 5 pilares de análisis</strong>, se busca
+          ofrecer una herramienta práctica y estructurada que permita por un lado, identificar brechas
+          en políticas, procesos y prácticas de gestión que impacten la atracción, desarrollo y
+          retención del capital humano; además de evaluar la efectividad en la estructuración de
+          vacantes tácticas y estratégicas.</p>
+        
+        <p>Este diagnóstico no constituye una evaluación de personas, sino un <strong>instrumento de
+          autogestión para la empresa</strong>. No debe interpretarse como un análisis profundo y detallado
+          de la situación actual de la compañía, es un ejercicio orientativo.</p>
+      </div>
     </div>
     <div class="pilares-analisis">
       <h3 class="primary-title">Pilares de análisis</h3>
@@ -67,8 +69,26 @@ export default {
 </script>
 
 <style scoped>
-.form-header {
-  margin-bottom: 0.25rem;
+.header-section {
+  background-color: #262626;
+  padding: 2rem;
+}
+
+.title-banner {
+  color: #F2B705;
+  padding: 1rem 0;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 3.5rem;
+}
+
+.primary-title {
+  background-color: #F2B705;
+  color: #262626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
 }
 
 .form-header h2 {
@@ -80,20 +100,24 @@ export default {
 }
 
 .descripcion-diagnostico {
-  margin: 0.1rem 0 3rem 0;
+  margin: 0.1rem 4rem;
   text-align: justify;
+  color: white;
 }
 
 .descripcion-diagnostico p {
-  margin-bottom: 0.1rem;
-  line-height: 1.3;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: white;
 }
 
 .pilares-analisis {
-  margin-top: 1.5rem;
+  background-color: #F2B705;
+  padding: 1.5rem;
 }
 
 .pilares-analisis h3 {
+  color: #262626;
   margin-bottom: 1rem;
   font-size: 1.6rem;
   text-align: center;
@@ -103,12 +127,13 @@ export default {
   list-style: none;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  margin: 0 4rem;
 }
 
 .pilares-analisis li {
-  background: #f8f9fa;
+  background: white;
   padding: 1.2rem;
   border-radius: 8px;
   border-left: 4px solid #FFC107;
@@ -125,7 +150,7 @@ export default {
 
 .pilares-analisis .peso-categoria {
   font-size: 1.5rem;
-  color: #0067b1;
+  color: #F2B705;
 }
 
 .pilares-analisis p {

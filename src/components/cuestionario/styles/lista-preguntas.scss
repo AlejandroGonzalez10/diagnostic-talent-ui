@@ -8,7 +8,7 @@
 
 .categoria-header {
   padding: 1.5rem;
-  background-color: #0067b1;
+  background-color: #F2B705;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 2rem;
   display: flex;
@@ -18,12 +18,13 @@
 
 .categoria-titulo {
   font-size: 1.4rem;
-  color: #fff;
+  color: #262626;
   margin: 0;
 }
 
 .categoria-descripcion {
-  color: #fff;
+  margin-bottom: 0.5rem;
+  color: #262626;
   line-height: 1.5;
   margin: 0;
   font-size: 1rem;
@@ -67,12 +68,6 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #2c3e50;
-}
-
-.categoria-descripcion {
-  color: #fff;
-  line-height: 1.5;
-  margin: 0;
 }
 
 .preguntas-lista {
@@ -236,6 +231,10 @@
   margin: 0;
   color: #2c3e50;
   font-size: 1.4rem;
+}
+
+.categorias-section{
+  margin: 0 5rem;
 }
 
 @media (max-width: 768px) {

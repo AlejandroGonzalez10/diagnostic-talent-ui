@@ -1,5 +1,4 @@
 .datos-iniciales {
-  margin-top: 3rem;
   margin-bottom: 1rem;
 }
 
@@ -8,6 +7,10 @@
   font-size: 1.5rem;
   margin-bottom: 0.1rem;
   text-align: center;
+}
+
+.datos-iniciales-titulo.title-datos-iniciales {
+  margin-top: 0;
 }
 
 .datos-section {
@@ -109,7 +112,7 @@
   .datos-section {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 2rem 10rem;
   }
 
   .datos-subsection {
