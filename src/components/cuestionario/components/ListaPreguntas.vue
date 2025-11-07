@@ -714,6 +714,7 @@ input[type="radio"]:checked {
 
 .boton-container {
   margin-top: 2rem;
+  margin-bottom: 2rem;
   text-align: right;
   display: flex;
   justify-content: flex-end;
@@ -747,8 +748,8 @@ input[type="radio"]:checked {
 }
 
 .btn-ver-resultado {
-  background: #0067b1;
-  color: white;
+  background: #FFD000;
+  color: #000000;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
