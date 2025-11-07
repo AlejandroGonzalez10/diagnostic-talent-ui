@@ -77,15 +77,39 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 4rem;
+  padding: 1rem 4rem;
   background-color: #2D2D2D;
 }
 
 .logo-izquierda,
 .logo-derecha {
-  max-height: 80px;
+  max-height: 60px;
   width: auto;
   object-fit: contain;
+}
+
+/* Responsive para tablets */
+@media (max-width: 768px) {
+  .logos-container {
+    padding: 1rem 2rem;
+  }
+
+  .logo-izquierda,
+  .logo-derecha {
+    max-height: 50px;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .logos-container {
+    padding: 0.75rem 1rem;
+  }
+
+  .logo-izquierda,
+  .logo-derecha {
+    max-height: 40px;
+  }
 }
 
 .header-section {
@@ -153,24 +177,25 @@ export default {
 }
 
 .pilares-analisis li {
-  background: white;
-  padding: 1.2rem;
-  border-radius: 8px;
+  background: #F8F9FA;
+  padding: 0.5rem;
+  border-radius: 20px;
   border-left: 4px solid #FFC107;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 2px rgba(0, 0, 0, 0.1);
   text-align: left;
   display: flex;
 }
 
 .pilares-analisis strong {
   display: block;
-  margin-bottom: 0.75rem;
   font-size: 1.1rem;
 }
 
 .pilares-analisis .peso-categoria {
   font-size: 1.5rem;
   color: #FFD000;
+  align-content: center;
+  font-weight: bold;
 }
 
 .pilares-analisis p {

@@ -50,10 +50,4 @@ body,html {
   height: 64px;
   object-fit: contain;
 }
-
-@media (max-width: 768px) {
-  .cuestionario-container{
-    padding: 5px 15px;
-  }
-}
 </style>

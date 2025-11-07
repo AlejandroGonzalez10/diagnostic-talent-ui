@@ -763,7 +763,7 @@ input[type="radio"]:checked {
 }
 
 .btn-ver-resultado:hover:not(:disabled) {
-  background: #005a9e;
+  background: #FFC107;
   transform: translateY(-1px);
 }
 
