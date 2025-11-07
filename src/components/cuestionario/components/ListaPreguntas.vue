@@ -1,49 +1,55 @@
 <template>
   <div class="categorias-section">
-    <div v-for="(categoria, index) in categorias" :key="categoria.id" class="categoria-wrapper">
-      <div class="categoria-header">
-        <h3 class="categoria-titulo">{{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
-        <p class="categoria-descripcion">{{ categoria.description || categoria.descripcion || categoria.desc || 'Sin descripción' }}</p>
-      </div>
+    <div v-for="(categoria, index) in categorias" :key="categoria.id">
+      <div class="categoria-wrapper">
+        <div class="categoria-header">
+          <h3 class="categoria-titulo">{{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
+          <p class="categoria-descripcion">{{ categoria.description || categoria.descripcion || categoria.desc || 'Sin descripción' }}</p>
+        </div>
 
-      <div class="preguntas-lista">
-        <div v-for="(pregunta, index) in preguntasPorCategoria[categoria.id]" 
-             :key="pregunta.id"
-             class="pregunta-item ocultar-en-pdf"
-             :class="{ 'respondida': respuestasLocales[pregunta.id] }">
-          <div class="pregunta-numero-mobile">{{ index + 1 }}</div>
-          <div class="pregunta-header">
-            <span class="pregunta-numero">{{ index + 1 }}.</span>
-            <p class="pregunta-texto">{{ pregunta.label }}</p>
-          </div>
-          
-          <div class="pregunta-contenido">
-            <div class="valoracion-cualitativa">
-              <div class="opciones-grupo">
-                <label v-for="opcion in opciones" 
-                       :key="opcion.id" 
-                       class="opcion-radio">
-                  <input type="radio"
-                         :name="'pregunta' + pregunta.id"
-                         :value="opcion.value"
-                         v-model="respuestasLocales[pregunta.id]"
-                         @change="onRespuestaChange(pregunta.id, $event.target.value)" />
-                  <span class="opcion-texto">{{ opcion.option }}</span>
-                </label>
+        <div class="preguntas-lista">
+          <div v-for="(pregunta, index) in preguntasPorCategoria[categoria.id]" 
+               :key="pregunta.id"
+               class="pregunta-item ocultar-en-pdf"
+               :class="{ 'respondida': respuestasLocales[pregunta.id] }">
+            <div class="pregunta-container">
+              <div class="pregunta-numero-mobile">{{ index + 1 }}</div>
+              <div class="pregunta-header">
+                <span class="pregunta-numero">{{ index + 1 }}.</span>
+                <p class="pregunta-texto">{{ pregunta.label }}</p>
               </div>
-            </div>
-            
-            <div class="valoracion-cuantitativa">
-              <span v-if="respuestasLocales[pregunta.id]" 
-                    class="valor-respuesta"
-                    :class="getValorClass(respuestasLocales[pregunta.id])">
-                {{ calcularPuntajePregunta(respuestasLocales[pregunta.id], opciones) }} puntos
-              </span>
+              
+              <div class="pregunta-contenido">
+                <div class="valoracion-cualitativa">
+                  <div class="opciones-grupo">
+                    <label v-for="opcion in opciones" 
+                           :key="opcion.id" 
+                           class="opcion-radio">
+                      <input type="radio"
+                             :name="'pregunta' + pregunta.id"
+                             :value="opcion.value"
+                             v-model="respuestasLocales[pregunta.id]"
+                             @change="onRespuestaChange(pregunta.id, $event.target.value)" />
+                      <span class="opcion-texto">{{ opcion.option }}</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div class="valoracion-cuantitativa">
+                  <span v-if="respuestasLocales[pregunta.id]" 
+                        class="valor-respuesta"
+                        :class="getValorClass(respuestasLocales[pregunta.id])">
+                    {{ calcularPuntajePregunta(respuestasLocales[pregunta.id], opciones) }} puntos
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <div class="categoria-score">
+      </div>
+      
+      <div class="categoria-score">
+        <div class="categoria-score-content">
           <span>Resultado pilar {{ index + 1 }}. {{ categoria.name }}:</span>
           <strong>{{ calcularPuntajeCategoria(categoria.id) }}</strong>
         </div>
@@ -552,7 +558,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e0e0e0;
 }

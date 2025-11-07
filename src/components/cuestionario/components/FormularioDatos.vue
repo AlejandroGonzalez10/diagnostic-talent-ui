@@ -340,14 +340,14 @@ export default {
 @import '../styles/formulario-datos.scss';
 
 .title-datos-iniciales {
-  background-color: #262626;
-  color: #F2B705;
+  background-color: #2D2D2D;
+  color: #FFD000;
   padding: 2rem;
   text-align: center;
 }
 
 .primary-title-datos {
-  color: #F2B705;
+  color: #FFD000;
   margin-bottom: 1.5rem;
 }
 

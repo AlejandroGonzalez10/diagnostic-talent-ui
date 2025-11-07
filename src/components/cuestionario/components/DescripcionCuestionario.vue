@@ -1,5 +1,9 @@
 <template>
   <div class="form-header">
+    <div class="logos-container">
+      <img src="@/assets/img-colsubsidio.jpeg" alt="Colsubsidio" class="logo-izquierda" />
+      <img src="@/assets/img-linkedin.jpeg" alt="LinkedIn" class="logo-derecha" />
+    </div>
     <div class="header-section">
       <h1 class="title-banner">Diagnóstico digital de entorno laboral</h1>
       <div class="descripcion-diagnostico">
@@ -69,22 +73,38 @@ export default {
 </script>
 
 <style scoped>
+.logos-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  background-color: #2D2D2D;
+}
+
+.logo-izquierda,
+.logo-derecha {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
 .header-section {
-  background-color: #262626;
+  background-color: #2D2D2D;
   padding: 2rem;
 }
 
 .title-banner {
-  color: #F2B705;
+  color: #FFD000;
   padding: 1rem 0;
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 3.5rem;
+  margin-top: 0;
 }
 
 .primary-title {
-  background-color: #F2B705;
-  color: #262626;
+  background-color: #FFD000;
+  color: #2D2D2D;
   padding: 0.75rem 1rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
@@ -112,12 +132,12 @@ export default {
 }
 
 .pilares-analisis {
-  background-color: #F2B705;
+  background-color: #FFD000;
   padding: 1.5rem;
 }
 
 .pilares-analisis h3 {
-  color: #262626;
+  color: #2D2D2D;
   margin-bottom: 1rem;
   font-size: 1.6rem;
   text-align: center;
@@ -150,7 +170,7 @@ export default {
 
 .pilares-analisis .peso-categoria {
   font-size: 1.5rem;
-  color: #F2B705;
+  color: #FFD000;
 }
 
 .pilares-analisis p {
