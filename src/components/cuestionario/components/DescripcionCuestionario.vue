@@ -108,7 +108,7 @@ export default {
 
   .logo-izquierda,
   .logo-derecha {
-    max-height: 40px;
+    max-height: 1.625rem; /* equivalente a 26px */
   }
 }
 
@@ -124,6 +124,23 @@ export default {
   margin-bottom: 1.5rem;
   font-size: 3.5rem;
   margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .title-banner {
+    font-size: 2.5rem;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-banner {
+    font-size: 2.2rem;
+    padding: 0.5rem 0;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
 }
 
 .primary-title {
@@ -155,6 +172,19 @@ export default {
   color: white;
 }
 
+@media (max-width: 768px) {
+  .descripcion-diagnostico {
+    margin: 0.1rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .descripcion-diagnostico {
+    margin: 0.1rem 1rem;
+    text-align: left;
+  }
+}
+
 .pilares-analisis {
   background-color: #FFD000;
   padding: 1.5rem;
@@ -184,6 +214,25 @@ export default {
   box-shadow: 0 6px 2px rgba(0, 0, 0, 0.1);
   text-align: left;
   display: flex;
+}
+
+@media (max-width: 768px) {
+  .pilares-analisis ul {
+    margin: 0 2rem;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pilares-analisis ul {
+    grid-template-columns: 1fr;
+    margin: 0 1rem;
+    gap: 1rem;
+  }
+
+  .pilares-analisis li {
+    padding: 0.75rem;
+  }
 }
 
 .pilares-analisis strong {
