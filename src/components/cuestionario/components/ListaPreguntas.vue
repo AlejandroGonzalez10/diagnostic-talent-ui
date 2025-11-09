@@ -1045,15 +1045,15 @@ input[type="radio"]:checked {
 .pilar-item {
   padding: 1.5rem;
   margin-bottom: 1rem;
-  background: white;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
+  background: #F8F9FA;
+  border: 1px solid #F8F9FA;
+  border-radius: 20px;
   transition: all 0.3s ease;
 }
 
 .pilar-item:hover {
   background: #f8f9fa;
-  border-color: #0067b1;
+  border-color: #2D2D2D;
   box-shadow: 0 2px 8px rgba(0, 103, 177, 0.1);
 }
 
@@ -1079,19 +1079,19 @@ input[type="radio"]:checked {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #0067b1;
+  color: #2D2D2D;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  border: 1px solid #0067b1;
+  border: 1px solid #2D2D2D;
   border-radius: 6px;
   transition: all 0.3s ease;
   margin-top: 0.5rem;
 }
 
 .pilar-link:hover {
-  background: #0067b1;
+  background: #2D2D2D;
   color: white;
   transform: translateX(4px);
   box-shadow: 0 2px 8px rgba(0, 103, 177, 0.2);
@@ -1113,7 +1113,7 @@ input[type="radio"]:checked {
   width: 16px;
   height: 16px;
   border: 2px solid #e0e0e0;
-  border-top: 2px solid #0067b1;
+  border-top: 2px solid #2D2D2D;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -1181,10 +1181,6 @@ input[type="radio"]:checked {
 
   .resultado-icon {
     font-size: 3rem;
-  }
-
-  .resultado-contenido {
-    padding: 1.5rem;
   }
 
   .resultado-titulo-simple {
