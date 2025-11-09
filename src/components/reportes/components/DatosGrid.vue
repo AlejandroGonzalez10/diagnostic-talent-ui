@@ -462,7 +462,7 @@ export default {
 
 .filtro-input:focus {
   outline: none;
-  border-color: #0067b1;
+  border-color: #2D2D2D;
   box-shadow: 0 0 0 3px rgba(0, 103, 177, 0.1);
 }
 
@@ -472,8 +472,8 @@ export default {
 }
 
 .btn-limpiar {
-  background: #0067b1;
-  color: white;
+  background: #FFD000;
+  color: #2D2D2D;
   border: none;
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -483,7 +483,7 @@ export default {
 }
 
 .btn-limpiar:hover {
-  background: #005694;
+  background: #FFE000;
 }
 
 .resultados-info {
@@ -530,8 +530,8 @@ export default {
 }
 
 .btn-reintentar {
-  background: #0067b1;
-  color: white;
+  background: #FFD000;
+  color: #2D2D2D;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -548,8 +548,8 @@ export default {
 }
 
 .datos-tabla th {
-  background: #0067b1;
-  color: white;
+  background: #2D2D2D;
+  color: #FFD000;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -565,7 +565,7 @@ export default {
 }
 
 .datos-tabla th.sortable:hover {
-  background: #005a9e;
+  background: #2D2D2D;
 }
 
 .sort-icon {
@@ -596,8 +596,8 @@ export default {
 }
 
 .btn-pdf {
-  background: #dc3545;
-  color: white;
+  background: #FFD000;
+  color: #2D2D2D;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -610,7 +610,7 @@ export default {
 }
 
 .btn-pdf:hover:not(:disabled) {
-  background: #c82333;
+  background: #FFD000;
 }
 
 .btn-pdf:disabled {
@@ -665,9 +665,9 @@ export default {
 }
 
 .btn-pagina:hover:not(:disabled) {
-  background: #0067b1;
-  color: white;
-  border-color: #0067b1;
+  background: #2D2D2D;
+  color: #FFD000;
+  border-color: #2D2D2D;
 }
 
 .btn-pagina:disabled {
@@ -678,9 +678,9 @@ export default {
 }
 
 .btn-pagina.activa {
-  background: #0067b1;
-  color: white;
-  border-color: #0067b1;
+  background: #2D2D2D;
+  color: #FFD000;
+  border-color: #2D2D2D;
   font-weight: 600;
 }
 
@@ -705,8 +705,8 @@ export default {
 
 .select-tamano:focus {
   outline: none;
-  border-color: #0067b1;
-  box-shadow: 0 0 0 3px rgba(0, 103, 177, 0.1);
+  border-color: #2D2D2D;
+  box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.1);
 }
 
 /* Responsive */

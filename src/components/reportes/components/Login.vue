@@ -170,7 +170,7 @@ export default {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2D2D2D 0%, #2D2D2D 100%);
 }
 
 .login-card {
@@ -266,12 +266,12 @@ export default {
 .btn-login {
   width: 100%;
   padding: 0.875rem;
-  background: #0067b1;
-  color: white;
+  background: #FFD000;
+  color: #2D2D2D;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   display: flex;
@@ -281,7 +281,7 @@ export default {
 }
 
 .btn-login:hover:not(:disabled) {
-  background: #005a9e;
+  background: #FFD000;
   transform: translateY(-1px);
 }
 

@@ -2,8 +2,11 @@
   <header class="reportes-header">
     <div class="header-content">
       <div class="header-left">
+        <div class="logos-container">
+          <img src="@/assets/img-colsubsidio.jpeg" alt="Logo Colsubsidio" class="logo-img">
+          <img src="@/assets/img-linkedin.jpeg" alt="Logo LinkedIn" class="logo-img">
+        </div>
         <h1 class="app-title">
-          <span class="title-icon">📊</span>
           Diagnóstico digital de entorno laboral - Reporte
         </h1>
       </div>
@@ -42,8 +45,8 @@ export default {
 
 <style scoped>
 .reportes-header {
-  background: linear-gradient(135deg, #0067b1 0%, #005a9e 100%);
-  color: white;
+  background: linear-gradient(135deg, #2D2D2D 0%, #2D2D2D 100%);
+  color: #FFD000;
   padding: 1rem 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -71,8 +74,17 @@ export default {
   gap: 0.75rem;
 }
 
-.title-icon {
-  font-size: 2rem;
+.logos-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .header-subtitle {
@@ -115,8 +127,8 @@ export default {
 }
 
 .btn-logout {
-  background: rgba(220, 53, 69, 0.2);
-  color: white;
+  background: #FFD000;
+  color: #2D2D2D;
   border: 1px solid rgba(220, 53, 69, 0.3);
   padding: 0.625rem 1rem;
   border-radius: 10px;
@@ -130,7 +142,7 @@ export default {
 }
 
 .btn-logout:hover {
-  background: rgba(220, 53, 69, 0.3);
+  background: #FFD000;
   transform: translateY(-1px);
 }
 
@@ -151,9 +163,20 @@ export default {
     font-size: 1.5rem;
     justify-content: center;
   }
+
+  .logos-container {
+    justify-content: center;
+  }
+
+  .logo-img {
+    height: 2.5rem; /* 40px */
+  }
 }
 
 @media (max-width: 480px) {
+  .logo-img {
+    height: 1.625rem; /* 26px */
+  }
   .header-content {
     padding: 0 0.5rem;
   }
