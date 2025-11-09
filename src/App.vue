@@ -21,12 +21,16 @@ export default {
 </script>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap");* {
-    -webkit-tap-highlight-color: transparent
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+    -webkit-tap-highlight-color: transparent;
 }
 
-body,html {
-    font-family: Source Sans Pro,sans-serif;
+/* Aplicar Inter como fuente principal */
+body,
+html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     margin: 0;
     min-height: 100%;
     overflow-x: hidden;
