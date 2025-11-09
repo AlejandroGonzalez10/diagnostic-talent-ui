@@ -90,52 +90,56 @@
       <div class="resultado-modal" @click.stop>
 
         <div class="resultado-contenido">
-          <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
-          
-          <div class="puntaje-principal">
-            <div class="puntaje-numero">{{ calcularPuntajeTotal() }}</div>
-            <div class="puntaje-clasificacion" :class="getClasificacionClass()">
-              {{ getClasificacionTexto() }}
+          <div class="resultado-general">
+            <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
+            
+            <div class="puntaje-principal">
+              <div class="puntaje-numero">{{ calcularPuntajeTotal() }}</div>
+              <div class="puntaje-clasificacion" :class="getClasificacionClass()">
+                {{ getClasificacionTexto() }}
+              </div>
+            </div>
+
+            <div class="resultado-descripcion">
+              <p v-html="getDescripcionResultado()"></p>
             </div>
           </div>
 
-          <div class="resultado-descripcion">
-            <p v-html="getDescripcionResultado()"></p>
-          </div>
-
-          <!-- Detalles por pilar (solo pilares con promedio <= 2) -->
-          <div class="resultado-detalles" v-if="pilaresBajos.length > 0">
-            <h3>Análisis por Pilar</h3>
-            <div v-for="categoria in pilaresBajos" :key="categoria.id" class="pilar-item">
-              <div class="pilar-info">
-                <div class="pilar-nombre">{{ categoria.name }}</div>
-                <div v-if="cargandoInsights[categoria.id]" class="pilar-cargando">
-                  <span class="loading-mini"></span>
-                  <span class="loading-text">Cargando análisis...</span>
-                </div>
-                <div v-else>
-                  <div class="pilar-descripcion">
-                    {{ insightsPorPilar[categoria.id]?.descripcion || 'Cargando información del pilar...' }}
+          <div class="resultado-analisis">
+            <!-- Detalles por pilar (solo pilares con promedio <= 2) -->
+            <div class="resultado-detalles" v-if="pilaresBajos.length > 0">
+              <h3>Análisis por Pilar</h3>
+              <div v-for="categoria in pilaresBajos" :key="categoria.id" class="pilar-item">
+                <div class="pilar-info">
+                  <div class="pilar-nombre">{{ categoria.name }}</div>
+                  <div v-if="cargandoInsights[categoria.id]" class="pilar-cargando">
+                    <span class="loading-mini"></span>
+                    <span class="loading-text">Cargando análisis...</span>
                   </div>
-                  <a v-if="insightsPorPilar[categoria.id]?.link" 
-                     :href="insightsPorPilar[categoria.id].link" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     class="pilar-link">
-                    <span class="link-icon">🔗</span>
-                    Ver más información
-                  </a>
+                  <div v-else>
+                    <div class="pilar-descripcion">
+                      {{ insightsPorPilar[categoria.id]?.descripcion || 'Cargando información del pilar...' }}
+                    </div>
+                    <a v-if="insightsPorPilar[categoria.id]?.link" 
+                       :href="insightsPorPilar[categoria.id].link" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="pilar-link">
+                      <span class="link-icon">🔗</span>
+                      Ver más información
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <!-- Mensaje si no hay pilares bajos -->
-          <div v-else class="sin-pilares-bajos">
-            <div class="mensaje-excelente">
-              <span class="icono-excelente">🎉</span>
-              <h3>¡Excelente Desempeño!</h3>
-              <p>Todos los pilares tienen una puntuación superior a 2.00. La organización muestra fortalezas consistentes en todas las áreas evaluadas.</p>
+            
+            <!-- Mensaje si no hay pilares bajos -->
+            <div v-else class="sin-pilares-bajos">
+              <div class="mensaje-excelente">
+                <span class="icono-excelente">🎉</span>
+                <h3>¡Excelente Desempeño!</h3>
+                <p>Todos los pilares tienen una puntuación superior a 2.00. La organización muestra fortalezas consistentes en todas las áreas evaluadas.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -755,7 +759,7 @@ input[type="radio"]:checked {
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -862,8 +866,8 @@ input[type="radio"]:checked {
 }
 
 .alert-btn {
-  background: #0067b1;
-  color: white;
+  background: #FFD000;
+  color: #000000;
   border: none;
   padding: 0.75rem 2rem;
   border-radius: 8px;
@@ -875,9 +879,9 @@ input[type="radio"]:checked {
 }
 
 .alert-btn:hover {
-  background: #005a9e;
+  background: #FFC107;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 103, 177, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 208, 0, 0.3);
 }
 
 .alert-btn:active {
@@ -937,13 +941,9 @@ input[type="radio"]:checked {
   transform: rotate(90deg);
 }
 
-.resultado-contenido {
-  padding: 2.5rem 2rem;
-}
-
 .resultado-titulo-simple {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: #FFD000;
   margin: 0 0 1.5rem 0;
   font-weight: 600;
   text-align: center;
@@ -958,7 +958,7 @@ input[type="radio"]:checked {
 .puntaje-numero {
   font-size: 3.5rem;
   font-weight: bold;
-  color: #0067b1;
+  color: #FFD000;
   line-height: 1;
   margin-bottom: 1rem;
 }
@@ -970,11 +970,7 @@ input[type="radio"]:checked {
   letter-spacing: 1.5px;
   display: inline-block;
   margin-top: 0.5rem;
-  color: #0067b1;
-}
-
-.clasificacion-crecimiento {
-  color: #0067b1;
+  color: #FFD000;
 }
 
 .clasificacion-maduracion {
@@ -986,23 +982,22 @@ input[type="radio"]:checked {
 }
 
 .resultado-descripcion {
-  background: #f8f9fa;
   padding: 1.5rem;
   border-radius: 12px;
   margin-bottom: 2rem;
-  border-left: 4px solid #0067b1;
 }
 
 .resultado-descripcion p {
   font-size: 1rem;
   line-height: 1.8;
-  color: #495057;
+  color: white;
   margin: 0;
   text-align: justify;
 }
 
 .resultado-detalles {
-  margin-top: 2rem;
+  background-color: #FFD000;
+  padding: 1rem 4rem;
 }
 
 .resultado-detalles h3 {
@@ -1010,7 +1005,7 @@ input[type="radio"]:checked {
   color: #2c3e50;
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid #2D2D2D;
 }
 
 .sin-pilares-bajos {
@@ -1068,7 +1063,6 @@ input[type="radio"]:checked {
 
 .pilar-nombre {
   font-size: 1.1rem;
-  color: #0067b1;
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
@@ -1135,8 +1129,8 @@ input[type="radio"]:checked {
 }
 
 .btn-cerrar-resultado {
-  background: linear-gradient(135deg, #0067b1 0%, #005a9e 100%);
-  color: white;
+  background: linear-gradient(135deg, #FFD000 0%, #FFD000 100%);
+  color: #2D2D2D;
   border: none;
   padding: 1rem 3rem;
   border-radius: 10px;
