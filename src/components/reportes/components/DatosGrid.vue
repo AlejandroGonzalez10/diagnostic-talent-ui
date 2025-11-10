@@ -330,21 +330,9 @@ export default {
       descargando.value = registro.id
       
       try {
-        // Simular descarga de PDF - aquí se haría la llamada real a la API
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        
-        // Aquí se implementaría la descarga real del PDF
-        
-        // Simulación de descarga
-        const blob = new Blob(['PDF content for ' + registro.empresa], { type: 'application/pdf' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `reporte_${registro.empresa.replace(/\s+/g, '_')}_${registro.id}.pdf`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
+        const response = await reportesApi.generarPDF(registro.id);
+        const url = URL.createObjectURL(response);
+        window.open(url, "_blank"); // abrir en nueva pestaña
         
       } catch (err) {
         console.error('Error descargando PDF:', err)

@@ -48,6 +48,7 @@ export default {
   background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
   margin: 0;
   padding: 0;
+  font-family: 'Inter';
 }
 
 .reportes-main {

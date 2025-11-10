@@ -6,9 +6,6 @@
           <img src="@/assets/img-colsubsidio.jpeg" alt="Logo Colsubsidio" class="logo-img">
           <img src="@/assets/img-linkedin.jpeg" alt="Logo LinkedIn" class="logo-img">
         </div>
-        <h1 class="app-title">
-          Diagnóstico digital de entorno laboral - Reporte
-        </h1>
       </div>
       
       <div class="header-right">

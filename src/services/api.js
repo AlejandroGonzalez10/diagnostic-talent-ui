@@ -100,6 +100,11 @@ class HttpClient {
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`)
       }
 
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/pdf")) {
+        return await response.blob();
+      }
+
       return await response.json()
     } catch (error) {
       clearTimeout(timeoutId)
@@ -147,7 +152,8 @@ const ENDPOINTS = {
   QUESTIONNAIRE: '/quiestionaire',
   QUESTIONNAIRE_ANSWER: '/quiestionaire/answer',
   QUESTIONNAIRE_REPORT: '/quiestionaire/report',
-  QUESTIONNAIRE_AI: '/quiestionaire/ai-research'
+  QUESTIONNAIRE_AI: '/quiestionaire/ai-research',
+  GEN_PDF: '/dashboard/pdf'
 }
 
 export const categoriesApi = {
@@ -285,6 +291,14 @@ export const reportesApi = {
       return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_REPORT}?page=${page}&pageSize=${pageSize}`)
     } catch (error) {
       throw new Error('No se pudieron cargar los reportes')
+    }
+  },
+
+  async generarPDF(generalDataId) {
+    try {
+      return await httpClient.get(`${ENDPOINTS.GEN_PDF}/${generalDataId}`)
+    } catch (error) {
+      throw new Error('No se pudo generar el PDF del reporte')
     }
   }
 }
