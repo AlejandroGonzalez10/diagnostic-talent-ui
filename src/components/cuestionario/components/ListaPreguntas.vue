@@ -105,43 +105,7 @@
             </div>
           </div>
 
-          <div class="resultado-analisis">
-            <!-- Detalles por pilar (solo pilares con promedio <= 2) -->
-            <div class="resultado-detalles" v-if="pilaresBajos.length > 0">
-              <h3>Análisis por Pilar</h3>
-              <div v-for="categoria in pilaresBajos" :key="categoria.id" class="pilar-item">
-                <div class="pilar-info">
-                  <div class="pilar-nombre">{{ categoria.name }}</div>
-                  <div v-if="cargandoInsights[categoria.id]" class="pilar-cargando">
-                    <span class="loading-mini"></span>
-                    <span class="loading-text">Cargando análisis...</span>
-                  </div>
-                  <div v-else>
-                    <div class="pilar-descripcion">
-                      {{ insightsPorPilar[categoria.id]?.descripcion || 'Cargando información del pilar...' }}
-                    </div>
-                    <a v-if="insightsPorPilar[categoria.id]?.link" 
-                       :href="insightsPorPilar[categoria.id].link" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       class="pilar-link">
-                      <span class="link-icon">🔗</span>
-                      Ver más información
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Mensaje si no hay pilares bajos -->
-            <div v-else class="sin-pilares-bajos">
-              <div class="mensaje-excelente">
-                <span class="icono-excelente">🎉</span>
-                <h3>¡Excelente Desempeño!</h3>
-                <p>Todos los pilares tienen una puntuación superior a 2.00. La organización muestra fortalezas consistentes en todas las áreas evaluadas.</p>
-              </div>
-            </div>
-          </div>
+          
         </div>
 
         <div class="resultado-footer">
@@ -153,7 +117,6 @@
 </template>
 
 <script>
-import { researchApi } from '@/services/api'
 
 export default {
   name: 'QuestionList',
@@ -525,31 +488,6 @@ export default {
 
       // Marcar como cargando
       this.cargandoInsights[categoriaId] = true
-
-      try {
-        const response = await researchApi.generarInsight(categoriaId, this.sector)
-        
-        if (response && response.descripcion_capsula) {
-          // Guardar tanto la descripción como el link
-          this.insightsPorPilar[categoriaId] = {
-            descripcion: response.descripcion_capsula,
-            link: response.link_referencia || null
-          }
-        } else {
-          this.insightsPorPilar[categoriaId] = {
-            descripcion: 'No se pudo obtener información para este pilar.',
-            link: null
-          }
-        }
-      } catch (error) {
-        console.error(`Error cargando insight para pilar ${categoriaId}:`, error.message)
-        this.insightsPorPilar[categoriaId] = {
-          descripcion: 'No se pudo obtener información para este pilar.',
-          link: null
-        }
-      } finally {
-        this.cargandoInsights[categoriaId] = false
-      }
     }
   }
 }
