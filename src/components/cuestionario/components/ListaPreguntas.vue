@@ -1061,7 +1061,6 @@ input[type="radio"]:checked {
 .resultado-footer {
   padding: 1.5rem 2rem 2rem 2rem;
   text-align: center;
-  border-top: 1px solid #e9ecef;
 }
 
 .btn-cerrar-resultado {
