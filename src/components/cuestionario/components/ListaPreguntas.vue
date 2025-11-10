@@ -889,8 +889,6 @@ input[type="radio"]:checked {
 
 .puntaje-principal {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 2rem;
 }
 
 .puntaje-numero {
