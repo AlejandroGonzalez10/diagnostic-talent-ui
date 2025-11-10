@@ -103,6 +103,13 @@
             <div class="resultado-descripcion">
               <p v-html="getDescripcionResultado()"></p>
             </div>
+
+            <div class="bootcamp-invitacion">
+              <p class="bootcamp-mensaje">
+                Te invitamos a participar en el bootcamp donde podrás acceder a los resultados completos utilizando referentes de la industria
+              </p>
+              <div class="bootcamp-icon">🚀</div>
+            </div>
           </div>
 
           
@@ -910,17 +917,16 @@ input[type="radio"]:checked {
 }
 
 .clasificacion-maduracion {
-  color: #0067b1;
+  color: #FFD000;
 }
 
 .clasificacion-consolidacion {
-  color: #0067b1;
+  color: #FFD000;
 }
 
 .resultado-descripcion {
-  padding: 1.5rem;
+  padding: 0.5rem;
   border-radius: 12px;
-  margin-bottom: 2rem;
 }
 
 .resultado-descripcion p {
@@ -929,6 +935,27 @@ input[type="radio"]:checked {
   color: white;
   margin: 0;
   text-align: justify;
+}
+
+.bootcamp-invitacion {
+  padding: 1.2rem;
+  background: #FFD000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.bootcamp-icon {
+  font-size: 1.5rem;
+}
+
+.bootcamp-mensaje {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #2D2D2D;
+  margin: 0;
 }
 
 .resultado-detalles {
