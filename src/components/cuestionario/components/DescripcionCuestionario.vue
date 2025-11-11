@@ -2,7 +2,6 @@
   <div class="form-header">
     <div class="logos-container">
       <img src="@/assets/img-colsubsidio.jpeg" alt="Colsubsidio" class="logo-izquierda" />
-      <img src="@/assets/img-linkedin.jpeg" alt="LinkedIn" class="logo-derecha" />
     </div>
     <div class="header-section">
       <h1 class="title-banner">Diagnóstico digital de entorno laboral</h1>

@@ -234,9 +234,9 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 56px;
+  height: 3.5rem; /* 56px */
   background: #2D2D2D;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 0.0625rem solid rgba(255,255,255,0.06); /* 1px */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -252,21 +252,21 @@ export default {
 
 .linkedin-icon {
   height: 100%;
-  max-height: 52px;
+  max-height: 3.6rem;
   object-fit: contain;
   display: block;
 }
 
 .footer-logo {
-  height: 36px;
+  height: 3.5rem;
   object-fit: contain;
   display: block;
 }
 
 /* Right-side supersubsidio logo should be larger */
 .footer-right-logo {
-  height: 48px;
-  max-height: 52px;
+  height: 2rem;
+  max-height: 3.25rem;
 }
 
 .footer-left,
@@ -287,5 +287,39 @@ export default {
 .main-form-container,
 .main-form {
   padding-bottom: 20px; /* footer height (56px) + breathing room */
+}
+
+/* Mobile adjustments: make footer images smaller and reduce horizontal padding */
+@media (max-width: 480px) {
+  .fixed-footer {
+    height: 3rem;
+    padding: 0 0.5rem;
+  }
+
+  /* Left logo slightly smaller on phones */
+  .footer-left .footer-logo,
+  .footer-left-logo {
+    height: 2.5rem;
+    max-height: 2.5rem;
+  }
+
+  /* Center LinkedIn image max height on phones */
+  .footer-center .linkedin-icon {
+    max-height: 2.5rem;
+  }
+
+  /* Right logo much smaller on phones */
+  .footer-right .footer-logo,
+  .footer-right-logo {
+    height: 1.25rem;
+    max-height: 1.25rem;
+  }
+
+  /* Reduce bottom padding so content still visible above footer on small screens */
+  .cuestionario-container,
+  .main-form-container,
+  .main-form {
+    padding-bottom: 4rem; /* ensure adequate space above footer */
+  }
 }
 </style>
