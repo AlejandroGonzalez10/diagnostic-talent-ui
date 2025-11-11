@@ -16,7 +16,13 @@
               <div class="pregunta-numero-mobile">{{ index + 1 }}</div>
               <div class="pregunta-header">
                 <span class="pregunta-numero">{{ index + 1 }}.</span>
-                <p class="pregunta-texto">{{ pregunta.label }}</p>
+                <p v-if="esPreguntaTooltip(pregunta.id) && pregunta.id == 1" class="pregunta-texto">
+                  ¿Los procesos para atraer el talento <span class="tooltip" v-tooltip="tooltipTactico">táctico</span> <span class="tooltip" v-tooltip="tooltipEstrategico">estratégico</span> destacan frente a la competencia?
+                </p>
+                <p v-if="esPreguntaTooltip(pregunta.id) && pregunta.id == 9" class="pregunta-texto">
+                  ¿Las acciones de retención son atractivas y responden a intereses de talento <span class="tooltip" v-tooltip="tooltipTactico">táctico</span> y <span class="tooltip" v-tooltip="tooltipEstrategico">estratégico</span>?
+                </p>
+                <p v-if="!esPreguntaTooltip(pregunta.id)" class="pregunta-texto">{{ pregunta.label }}</p>
               </div>
               
               <div class="pregunta-contenido">
@@ -87,7 +93,8 @@
             <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
             
             <div class="clasificacion-container">
-              <p class="clasificacion-mensaje">Tus procesos internos de gestión del talento humano se encuentra en
+              <p class="clasificacion-mensaje">
+                Los procesos de gestión de Talento Humano, se encuentran en un estado de
                 <span :class="['clasificacion-texto', getClasificacionClass()]">
                   <strong>{{ getClasificacionTexto().toUpperCase() }}</strong>
                 </span>
@@ -96,7 +103,9 @@
 
             <div class="bootcamp-invitacion">
               <p class="bootcamp-mensaje">
-                Te invitamos a participar en el bootcamp donde podrás acceder a los resultados completos utilizando referentes de la industria
+                Participa en el <b>Bootcamp del 20 de noviembre</b> (en el horario que elegiste) y conoce tus puntajes por pilar, además del reporte completo del diagnóstico.
+                <br/><br/>
+                Disfruta una <b>asesoría personalizada</b> y una experiencia diseñada para fortalecer e inspirar tus procesos de <b>gestión del talento</b>. ¡No te lo pierdas!
               </p>
               <div class="bootcamp-icon">🚀</div>
             </div>
@@ -161,7 +170,9 @@ export default {
       alertaMensaje: '',
       alertaSubmensaje: '',
       insightsPorPilar: {},
-      cargandoInsights: {}
+      cargandoInsights: {},
+      tooltipTactico: 'personas con roles relaciones con la coordinación o supervisión de actividades y equipos, que buscan cumplir objetivos clave y traducir los planes futuros en acciones con impacto para la empresa',
+      tooltipEstrategico: 'personas con roles enfocados en la definición de metas, planes y/o decisiones organizacionales clave que proyectan el futuro de la empresa'
     }
   },
   computed: {
@@ -224,6 +235,12 @@ export default {
     }
   },
   methods: {
+    esPreguntaTooltip(id){
+      if(id == 1 || id == 9){
+        return true
+      }
+      return false;
+    },
     calcularPuntajeCategoria(categoriaId) {
       const preguntas = this.preguntasPorCategoria[categoriaId] || []
       if (preguntas.length === 0) return '0.00'
@@ -382,7 +399,7 @@ export default {
       const puntaje = parseFloat(this.calcularPuntajeTotal())
       
       if (puntaje >= 1 && puntaje <= 2) {
-        return 'En Crecimiento'
+        return 'Crecimiento'
       } else if (puntaje > 2 && puntaje <= 3.4) {
         return 'Maduración'
       } else if (puntaje > 3.4 && puntaje <= 5) {
@@ -737,6 +754,8 @@ input[type="radio"]:checked {
 .clasificacion-crecimiento,
 .clasificacion-maduracion,
 .clasificacion-consolidacion {
+  margin-top: 20px;
+  font-size: 1.3rem;
   color: #FFD000; /* usar color amarillo consistente */
 }
 
@@ -1338,5 +1357,10 @@ input[type="radio"]:checked {
 
 .text-center {
   text-align: center;
+}
+
+.tooltip{
+  cursor: pointer;
+  font-style: italic;
 }
 </style>
