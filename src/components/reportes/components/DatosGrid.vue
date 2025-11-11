@@ -76,12 +76,7 @@
                 {{ direccionOrden === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
-            <th @click="ordenarPor('empleados')" class="sortable">
-              Número de empleados
-              <span class="sort-icon" v-if="ordenActual === 'empleados'">
-                {{ direccionOrden === 'asc' ? '↑' : '↓' }}
-              </span>
-            </th>
+            <!-- Número de empleados column removed (field no longer collected in the form) -->
             <th @click="ordenarPor('contacto')" class="sortable">
               Nombre quien diligenció
               <span class="sort-icon" v-if="ordenActual === 'contacto'">
@@ -114,7 +109,7 @@
             <td class="empresa-cell">{{ registro.empresa }}</td>
             <td>{{ registro.nit }}</td>
             <td>{{ registro.sector }}</td>
-            <td>{{ registro.empleados }}</td>
+            <!-- registro.empleados removed -->
             <td class="contacto-cell">{{ registro.contacto }}</td>
             <td>{{ registro.cargo }}</td>
             <td>{{ registro.email }}</td>
@@ -242,7 +237,7 @@ export default {
           empresa: item.company || '',
           nit: item.nit || '',
           sector: item.sector || '',
-          empleados: item.employees_number || 0,
+          // empleados field removed from grid mapping - form no longer collects it
           contacto: item.chief_name || '',
           cargo: item.company_role || '',
           email: item.chief_email || '',

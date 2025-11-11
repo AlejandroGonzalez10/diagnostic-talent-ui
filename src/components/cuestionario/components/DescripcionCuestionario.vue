@@ -214,6 +214,8 @@ export default {
   box-shadow: 0 6px 2px rgba(0, 0, 0, 0.1);
   text-align: left;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -240,11 +242,18 @@ export default {
   font-size: 1.1rem;
 }
 
+/* Make the left content take remaining space so the percentage sits on the right */
+.pilares-analisis li > div:first-child {
+  flex: 1 1 auto;
+}
+
 .pilares-analisis .peso-categoria {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: #FFD000;
-  align-content: center;
-  font-weight: bold;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: right;
+  margin-left: 1rem;
 }
 
 .pilares-analisis p {

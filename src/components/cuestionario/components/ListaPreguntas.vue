@@ -35,13 +35,6 @@
                   </div>
                 </div>
                 
-                <div class="valoracion-cuantitativa">
-                  <span v-if="respuestasLocales[pregunta.id]" 
-                        class="valor-respuesta"
-                        :class="getValorClass(respuestasLocales[pregunta.id])">
-                    {{ calcularPuntajePregunta(respuestasLocales[pregunta.id], opciones) }} puntos
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -93,6 +86,14 @@
           <div class="resultado-general">
             <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
             
+            <div class="clasificacion-container">
+              <p class="clasificacion-mensaje">Tus procesos internos de gestión del talento humano se encuentra en
+                <span :class="['clasificacion-texto', getClasificacionClass()]">
+                  <strong>{{ getClasificacionTexto().toUpperCase() }}</strong>
+                </span>
+              </p>
+            </div>
+
             <div class="bootcamp-invitacion">
               <p class="bootcamp-mensaje">
                 Te invitamos a participar en el bootcamp donde podrás acceder a los resultados completos utilizando referentes de la industria
@@ -341,7 +342,7 @@ export default {
       if (!this.datosCompletos) {
         this.alertaTitulo = 'Datos Incompletos'
         this.alertaMensaje = 'Por favor, completa todos los <strong>datos iniciales</strong> antes de ver el resultado.'
-        this.alertaSubmensaje = 'Verifica que hayas completado: Nombre de la empresa, NIT, Sector, Número de empleados, Nombre completo de quien diligencia, Cargo y Correo electrónico.'
+  this.alertaSubmensaje = 'Verifica que hayas completado: Nombre de la empresa, NIT, Sector, Nombre completo de quien diligencia, Cargo y Correo electrónico.'
         this.mostrarAlerta = true
         return
       }
@@ -561,6 +562,46 @@ th {
   justify-content: center;
 }
 
+/* Responsive: questions (left) and answers (right) on larger screens */
+@media (min-width: 900px) {
+  .pregunta-item .pregunta-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .pregunta-item .pregunta-header {
+    flex: 0 0 65%; /* left column: question text */
+    padding-right: 1rem;
+  }
+
+  .pregunta-item .pregunta-contenido {
+    flex: 1 1 35%; /* right column: answers */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* Make radio options align to the right column nicely */
+  .pregunta-item .opciones-grupo {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* Mobile: stack question and answers */
+@media (max-width: 899px) {
+  .pregunta-item .pregunta-container {
+    display: block;
+  }
+  .pregunta-item .pregunta-header {
+    padding-right: 0;
+  }
+  .pregunta-item .pregunta-contenido {
+    margin-top: 0.75rem;
+  }
+}
+
 .opcion-radio {
   display: flex;
   align-items: center;
@@ -673,6 +714,30 @@ input[type="radio"]:checked {
   font-size: 1.5rem;
   color: #0067b1;
   margin: 0;
+}
+
+/* Clasificación resaltada en modal */
+.clasificacion-container {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.clasificacion-mensaje {
+  font-size: 1rem;
+  color: white;
+  margin: 0.5rem 0 1rem;
+}
+
+.clasificacion-texto {
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-left: 0.25rem;
+}
+
+.clasificacion-crecimiento,
+.clasificacion-maduracion,
+.clasificacion-consolidacion {
+  color: #FFD000; /* usar color amarillo consistente */
 }
 
 .mensaje-advertencia {

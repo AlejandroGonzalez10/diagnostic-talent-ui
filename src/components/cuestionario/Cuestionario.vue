@@ -37,11 +37,19 @@
       </div>
     </div>
     
-    <!-- Fixed footer with LinkedIn icon -->
+    <!-- Fixed footer with three images (left, center LinkedIn, right). Images are non-clickable. -->
     <footer class="fixed-footer" role="contentinfo" aria-label="Pie de página">
-      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-        <img class="linkedin-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/linkedin.svg" alt="LinkedIn" />
-      </a>
+      <div class="footer-left">
+        <img src="@/assets/img-spe.jpeg" alt="SPE" class="footer-logo footer-left-logo" />
+      </div>
+
+      <div class="footer-center" aria-hidden="false">
+        <img class="linkedin-icon" src="@/assets/img-linkedin.jpeg" alt="LinkedIn" />
+      </div>
+
+      <div class="footer-right">
+        <img src="@/assets/img-supersubsidio.jpeg" alt="Supersubsidio" class="footer-logo footer-right-logo" />
+      </div>
     </footer>
   </div>
 </template>
@@ -227,11 +235,12 @@ export default {
   right: 0;
   bottom: 0;
   height: 56px;
-  background: #ffffff;
-  border-top: 1px solid #e6e6e6;
+  background: #2D2D2D;
+  border-top: 1px solid rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 0 1rem;
   z-index: 10000;
 }
 
@@ -242,9 +251,35 @@ export default {
 }
 
 .linkedin-icon {
-  width: 22px;
-  height: 22px;
-  filter: invert(16%) sepia(80%) saturate(2375%) hue-rotate(1deg) brightness(100%) contrast(92%);
+  height: 100%;
+  max-height: 52px;
+  object-fit: contain;
+  display: block;
+}
+
+.footer-logo {
+  height: 36px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Right-side supersubsidio logo should be larger */
+.footer-right-logo {
+  height: 48px;
+  max-height: 52px;
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.footer-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
 /* Ensure content is not hidden behind the fixed footer */
