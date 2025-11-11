@@ -3,7 +3,7 @@
     <div v-for="(categoria, index) in categorias" :key="categoria.id">
       <div class="categoria-wrapper">
         <div class="categoria-header">
-          <h3 class="categoria-titulo">{{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
+          <h3 class="categoria-titulo">Pilar {{ index + 1 }}. {{ categoria.name || categoria.title || categoria.nombre || 'Sin nombre' }}</h3>
           <p class="categoria-descripcion">{{ categoria.description || categoria.descripcion || categoria.desc || 'Sin descripción' }}</p>
         </div>
 
@@ -93,17 +93,6 @@
           <div class="resultado-general">
             <h2 class="resultado-titulo-simple">Resultado del Diagnóstico</h2>
             
-            <div class="puntaje-principal">
-              <div class="puntaje-numero">{{ calcularPuntajeTotal() }}</div>
-              <div class="puntaje-clasificacion" :class="getClasificacionClass()">
-                {{ getClasificacionTexto() }}
-              </div>
-            </div>
-
-            <div class="resultado-descripcion">
-              <p v-html="getDescripcionResultado()"></p>
-            </div>
-
             <div class="bootcamp-invitacion">
               <p class="bootcamp-mensaje">
                 Te invitamos a participar en el bootcamp donde podrás acceder a los resultados completos utilizando referentes de la industria

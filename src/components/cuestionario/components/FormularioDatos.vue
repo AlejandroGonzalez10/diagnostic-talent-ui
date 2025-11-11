@@ -48,23 +48,24 @@
               <option v-for="sector in sectores" :key="sector.SECId" :value="sector.SECNombre">
                 {{ sector.SECNombre }}
               </option>
+              <option value="Otro">Otro</option>
             </select>
             <p class="valor-para-pdf">{{ datosLocales.sector || 'No especificado' }}</p>
           </div>
 
-          <div class="form-group">
-            <label for="empleados">Número de empleados</label>
-            <input
-              type="number"
-              id="empleados"
-              v-model="datosLocales.empleados"
-              :class="{ 'error': errores.empleados }"
-              @blur="actualizarCampo('empleados')"
-              class="ocultar-input-en-pdf"
-              required
-            />
-            <p class="valor-para-pdf">{{ datosLocales.empleados || 'No especificado' }}</p>
-          </div>
+            <!-- 'Número de empleados' removed. When 'Otro' sector is selected a 'Cuál' text field will appear here -->
+            <div v-if="datosLocales.sector === 'Otro'" class="form-group">
+              <label for="cual">Cuál</label>
+              <input
+                type="text"
+                id="cual"
+                v-model="datosLocales.cual"
+                :class="{ 'error': errores.cual }"
+                @blur="actualizarCampo('cual')"
+                class="ocultar-input-en-pdf"
+              />
+              <p class="valor-para-pdf">{{ datosLocales.cual || 'No especificado' }}</p>
+            </div>
         </div>
       </div>
 
@@ -120,9 +121,10 @@
         <p v-if="errores.entidad" class="error-mensaje">Por favor, ingrese el nombre de la empresa</p>
         <p v-if="errores.nit" class="error-mensaje">Por favor, ingrese el NIT</p>
         <p v-if="errores.sector" class="error-mensaje">Por favor, ingrese el sector</p>
-        <p v-if="errores.empleados" class="error-mensaje">Por favor, ingrese el número de empleados</p>
+        
         <p v-if="errores.nombre" class="error-mensaje">Por favor, ingrese el nombre completo</p>
         <p v-if="errores.cargo" class="error-mensaje">Por favor, ingrese el cargo</p>
+        <p v-if="errores.cual" class="error-mensaje">Por favor, ingrese el sector</p>
         <p v-if="errores.correo" class="error-mensaje">Por favor, ingrese un correo electrónico válido</p>
       </div>
     </div>
@@ -144,7 +146,7 @@ export default {
         entidad: '',
         nit: '',
         sector: '',
-        empleados: '',
+        cual: '',
         nombre: '',
         cargo: '',
         correo: ''
@@ -162,7 +164,7 @@ export default {
       entidad: false,
       nit: false,
       sector: false,
-      empleados: false,
+      cual: false,
       nombre: false,
       cargo: false,
       correo: false
@@ -188,11 +190,21 @@ export default {
         
         if (datosExistentes && datosExistentes.id) {
           // Si hay datos existentes, cargarlos en el formulario
+          // Map backend sector to select or 'Otro' + cual
+          let mappedSector = datosExistentes.sector || ''
+          let mappedCual = ''
+          // If the sector from backend does not match any loaded sector, treat it as 'Otro' and store the value in 'cual'
+          const nombresSectores = (sectores.value || []).map(s => s.SECNombre)
+          if (mappedSector && nombresSectores.indexOf(mappedSector) === -1) {
+            mappedCual = mappedSector
+            mappedSector = 'Otro'
+          }
+
           datosLocales.value = {
             entidad: datosExistentes.entidad,
             nit: datosExistentes.nit,
-            sector: datosExistentes.sector,
-            empleados: datosExistentes.empleados,
+            sector: mappedSector,
+            cual: mappedCual,
             nombre: datosExistentes.nombre,
             cargo: datosExistentes.cargo,
             correo: datosExistentes.correo
@@ -246,18 +258,27 @@ export default {
         return
       }
 
-      const valor = datosLocales.value[campo]?.toString().trim()
+  const valor = datosLocales.value[campo]?.toString().trim()
       
       // Validar el campo
       if (campo === 'correo') {
         errores.value[campo] = valor.length > 0 ? !validarEmail(valor) : false
+      } else if (campo === 'cual') {
+        // validate only if 'Otro' selected
+        errores.value.cual = datosLocales.value.sector === 'Otro' ? (valor.length === 0) : false
       } else {
         errores.value[campo] = false
       }
 
-      // Si es el sector, emitir evento de cambio de sector SIEMPRE (incluso si está vacío)
+      // Emit sector-cambio: if sector is 'Otro' use 'cual' value, else use selected sector
       if (campo === 'sector') {
-        emit('sector-cambio', valor)
+        const effective = datosLocales.value.sector === 'Otro' ? (datosLocales.value.cual || '') : (datosLocales.value.sector || '')
+        emit('sector-cambio', effective)
+      }
+      if (campo === 'cual') {
+        // when custom sector changed, emit new effective sector
+        const effective = datosLocales.value.cual || ''
+        emit('sector-cambio', effective)
       }
 
       // Si el campo está vacío, no enviar actualización
@@ -270,12 +291,12 @@ export default {
         enviandoDatos.value = true
         
         // Enviar TODOS los datos del formulario, no solo el campo que cambió
+        const effectiveSector = datosLocales.value.sector === 'Otro' ? (datosLocales.value.cual || '') : (datosLocales.value.sector || '')
         const datosActualizacion = {
           id: generalDataId.value,
           company: datosLocales.value.entidad || '',
           nit: datosLocales.value.nit || '',
-          sector: datosLocales.value.sector || '',
-          employees_number: datosLocales.value.empleados ? parseInt(datosLocales.value.empleados) : 0,
+          sector: effectiveSector,
           chief_name: datosLocales.value.nombre || '',
           company_role: datosLocales.value.cargo || '',
           chief_email: datosLocales.value.correo || ''
@@ -295,11 +316,11 @@ export default {
 
     // Función para validar si todos los campos están completos
     const validarFormulario = () => {
+      const sectorValido = datosLocales.value.sector === 'Otro' ? (datosLocales.value.cual && datosLocales.value.cual.trim() !== '') : (datosLocales.value.sector && datosLocales.value.sector.trim() !== '')
       const todosCompletos = 
         datosLocales.value.entidad?.trim() !== '' &&
         datosLocales.value.nit?.trim() !== '' &&
-        datosLocales.value.sector?.trim() !== '' &&
-        datosLocales.value.empleados?.toString().trim() !== '' &&
+        sectorValido &&
         datosLocales.value.cargo?.trim() !== '' &&
         datosLocales.value.nombre?.trim() !== '' &&
         datosLocales.value.correo?.trim() !== '' &&

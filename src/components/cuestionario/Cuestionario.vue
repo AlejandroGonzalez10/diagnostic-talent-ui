@@ -1,13 +1,7 @@
 <template>
   <div class="cuestionario-container">
-    <!-- Código de acceso -->
-    <codigo-acceso
-      v-if="!codigoValidado"
-      @codigo-validado="iniciarCuestionario"
-    />
-
     <!-- Loading state -->
-    <div v-else-if="isLoading" class="loading-container">
+    <div v-if="isLoading" class="loading-container">
       <div class="loading-spinner"></div>
       <p>Cargando cuestionario...</p>
     </div>
@@ -31,7 +25,6 @@
         />
 
         <lista-preguntas
-          v-if="codigoValidado"
           :categorias="categorias"
           :preguntas-por-categoria="preguntasPorCategoria"
           :opciones="opciones"
@@ -43,12 +36,18 @@
         />
       </div>
     </div>
+    
+    <!-- Fixed footer with LinkedIn icon -->
+    <footer class="fixed-footer" role="contentinfo" aria-label="Pie de página">
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <img class="linkedin-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/linkedin.svg" alt="LinkedIn" />
+      </a>
+    </footer>
   </div>
 </template>
 
 <script>
 import { ref, onMounted, watch } from 'vue'
-import CodigoAcceso from './components/CodigoAcceso.vue'
 import FormularioDatos from './components/FormularioDatos.vue'
 import DescripcionCuestionario from './components/DescripcionCuestionario.vue'
 import ListaPreguntas from './components/ListaPreguntas.vue'
@@ -58,7 +57,6 @@ import { cuestionarioApi } from '@/services/api'
 export default {
   name: 'DiagnosticQuestionnaire',
   components: {
-    CodigoAcceso,
     FormularioDatos,
     DescripcionCuestionario,
     ListaPreguntas
@@ -220,5 +218,39 @@ export default {
   .main-form {
     max-width: 100% !important;
   }
+}
+
+/* Fixed footer styles */
+.fixed-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  background: #ffffff;
+  border-top: 1px solid #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.fixed-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.linkedin-icon {
+  width: 22px;
+  height: 22px;
+  filter: invert(16%) sepia(80%) saturate(2375%) hue-rotate(1deg) brightness(100%) contrast(92%);
+}
+
+/* Ensure content is not hidden behind the fixed footer */
+.cuestionario-container,
+.main-form-container,
+.main-form {
+  padding-bottom: 20px; /* footer height (56px) + breathing room */
 }
 </style>
