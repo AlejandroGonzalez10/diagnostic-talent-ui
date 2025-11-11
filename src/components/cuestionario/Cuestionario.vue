@@ -314,12 +314,5 @@ export default {
     height: 1.25rem;
     max-height: 1.25rem;
   }
-
-  /* Reduce bottom padding so content still visible above footer on small screens */
-  .cuestionario-container,
-  .main-form-container,
-  .main-form {
-    padding-bottom: 4rem; /* ensure adequate space above footer */
-  }
 }
 </style>
