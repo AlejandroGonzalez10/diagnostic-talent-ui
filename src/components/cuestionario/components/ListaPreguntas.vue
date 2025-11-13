@@ -17,7 +17,7 @@
               <div class="pregunta-header">
                 <span class="pregunta-numero">{{ index + 1 }}.</span>
                 <p v-if="esPreguntaTooltip(pregunta.id) && pregunta.id == 1" class="pregunta-texto">
-                  ¿Los procesos para atraer el talento <span class="tooltip" v-tooltip="tooltipTactico">táctico</span> <span class="tooltip" v-tooltip="tooltipEstrategico">estratégico</span> destacan frente a la competencia?
+                  ¿Los procesos para atraer el talento <span class="tooltip" v-tooltip="tooltipTactico">táctico</span> y <span class="tooltip" v-tooltip="tooltipEstrategico">estratégico</span> destacan frente a la competencia?
                 </p>
                 <p v-if="esPreguntaTooltip(pregunta.id) && pregunta.id == 9" class="pregunta-texto">
                   ¿Las acciones de retención son atractivas y responden a intereses de talento <span class="tooltip" v-tooltip="tooltipTactico">táctico</span> y <span class="tooltip" v-tooltip="tooltipEstrategico">estratégico</span>?
