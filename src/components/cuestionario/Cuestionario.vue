@@ -44,7 +44,7 @@
       </div>
 
       <div class="footer-center" aria-hidden="false">
-        <img class="linkedin-icon" src="@/assets/img-linkedin.jpeg" alt="LinkedIn" />
+        <img class="linkedin-icon" src="@/assets/full-logos.png" alt="Marcas" />
       </div>
 
       <div class="footer-right">
@@ -240,7 +240,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding: 5px 1rem;
   z-index: 10000;
 }
 
@@ -265,7 +265,7 @@ export default {
 
 /* Right-side supersubsidio logo should be larger */
 .footer-right-logo {
-  height: 2rem;
+  height: 1.6rem;
   max-height: 3.25rem;
 }
 
@@ -299,13 +299,13 @@ export default {
   /* Left logo slightly smaller on phones */
   .footer-left .footer-logo,
   .footer-left-logo {
-    height: 2.5rem;
-    max-height: 2.5rem;
+    height: 2.2rem;
+    max-height: 2.2rem;
   }
 
   /* Center LinkedIn image max height on phones */
   .footer-center .linkedin-icon {
-    max-height: 2.5rem;
+    max-height: 2.4rem;
   }
 
   /* Right logo much smaller on phones */
