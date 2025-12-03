@@ -153,7 +153,8 @@ const ENDPOINTS = {
   QUESTIONNAIRE_ANSWER: '/quiestionaire/answer',
   QUESTIONNAIRE_REPORT: '/quiestionaire/report',
   QUESTIONNAIRE_AI: '/quiestionaire/ai-research',
-  GEN_PDF: '/dashboard/pdf'
+  GEN_PDF: '/dashboard/pdf',
+  RAW: '/quiestionaire/raw'
 }
 
 export const categoriesApi = {
@@ -291,6 +292,14 @@ export const reportesApi = {
       return await httpClient.get(`${ENDPOINTS.QUESTIONNAIRE_REPORT}?page=${page}&pageSize=${pageSize}`)
     } catch (error) {
       throw new Error('No se pudieron cargar los reportes')
+    }
+  },
+
+  async obtenerRaw() {
+    try {
+      return await httpClient.get(ENDPOINTS.RAW)
+    } catch (error) {
+      throw new Error('No se pudo obtener el archivo raw')
     }
   },
 

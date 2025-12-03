@@ -34,9 +34,15 @@
 
     <!-- Información de resultados -->
     <div class="resultados-info">
-      <p>
-        Mostrando {{ datosFiltrados.length }} registros de {{ totalItems }} totales
+      <p class="resultados-text">
+        Mostrando <strong>{{ datosFiltrados.length }}</strong> registros de <strong>{{ totalItems }}</strong> totales
       </p>
+
+      <button @click="descargarCSV" :disabled="descargandoCSV" class="btn-descargar-csv" aria-label="Descargar CSV raw">
+        <span class="csv-icon" aria-hidden="true">⬇️</span>
+        <span v-if="descargandoCSV">Generando CSV...</span>
+        <span v-else>Exportar CSV</span>
+      </button>
     </div>
 
     <!-- Tabla de datos -->
@@ -101,6 +107,12 @@
                 {{ direccionOrden === 'asc' ? '↑' : '↓' }}
               </span>
             </th>
+            <th @click="ordenarPor('fill_categories')" class="sortable">
+              Datos completos
+              <span class="sort-icon" v-if="ordenActual === 'fill_categories'">
+                {{ direccionOrden === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -114,6 +126,7 @@
             <td>{{ registro.cargo }}</td>
             <td>{{ registro.email }}</td>
             <td>{{ formatearFecha(registro.fecha) }}</td>
+            <td>{{ registro.fill_categories === 5 ? 'SI' : 'NO' }}</td>
             <td class="acciones-cell">
               <button 
                 @click="descargarPDF(registro)" 
@@ -238,6 +251,7 @@ export default {
           nit: item.nit || '',
           sector: item.sector || '',
           // empleados field removed from grid mapping - form no longer collects it
+          fill_categories: item.fill_categories != null ? Number(item.fill_categories) : 0,
           contacto: item.chief_name || '',
           cargo: item.company_role || '',
           email: item.chief_email || '',
@@ -255,6 +269,86 @@ export default {
         console.error('Error cargando datos:', err)
       } finally {
         cargando.value = false
+      }
+    }
+
+    // Descargar CSV desde endpoint RAW
+    const descargandoCSV = ref(false)
+    const descargarCSV = async () => {
+      descargandoCSV.value = true
+      try {
+        const data = await reportesApi.obtenerRaw()
+
+        // data is expected to be an array of objects with specified fields
+        const headers = [
+          'id','empresa','nit','sector','diligencia','correo','cargo','creado_en','pilar','pregunta','respuesta'
+        ]
+
+        const formatDateCSV = (iso) => {
+          try {
+            const d = new Date(iso)
+            if (Number.isNaN(d.getTime())) return ''
+            const mm = String(d.getMonth() + 1).padStart(2, '0')
+            const dd = String(d.getDate()).padStart(2, '0')
+            const yyyy = d.getFullYear()
+            const hh = String(d.getHours()).padStart(2, '0')
+            const min = String(d.getMinutes()).padStart(2, '0')
+            return `${mm}/${dd}/${yyyy} ${hh}:${min}`
+          } catch (e) {
+            return ''
+          }
+        }
+
+        const rows = data.map(item => ({
+          id: item.id != null ? item.id : '',
+          empresa: item.company != null ? item.company : '',
+          nit: item.nit != null ? item.nit : '',
+          sector: item.sector != null ? item.sector : '',
+          diligencia: item.chief_name != null ? item.chief_name : '',
+          correo: item.chief_email != null ? item.chief_email : '',
+          cargo: item.company_role != null ? item.company_role : '',
+          creado_en: item.created_at != null ? formatDateCSV(item.created_at) : '',
+          pilar: item.category != null ? item.category : '',
+          pregunta: item.question != null ? item.question : '',
+          respuesta: item.value != null ? item.value : ''
+        }))
+
+        // Build CSV string, escape values
+        const escapeCsv = (val) => {
+          if (val === null || val === undefined) return ''
+          const s = String(val)
+          // escape double quotes
+          if (s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')) {
+            return '"' + s.replace(/"/g, '""') + '"'
+          }
+          return s
+        }
+
+        const csvLines = []
+        csvLines.push(headers.join(','))
+
+        rows.forEach(r => {
+          const line = headers.map(h => escapeCsv(r[h])).join(',')
+          csvLines.push(line)
+        })
+
+        const csvContent = '\uFEFF' + csvLines.join('\n') // add BOM for Excel
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const fecha = new Date().toISOString().slice(0,19).replace(/:/g,'-')
+        a.download = `report_raw_${fecha}.csv`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+
+      } catch (err) {
+        console.error('Error descargando CSV:', err)
+        alert('Error al generar el CSV. Intenta nuevamente.')
+      } finally {
+        descargandoCSV.value = false
       }
     }
 
@@ -337,6 +431,8 @@ export default {
       }
     }
 
+    // CSV download implemented above (descargarCSV with descargandoCSV flag)
+
     // Páginas visibles para la paginación
     const paginasVisibles = computed(() => {
       const paginas = []
@@ -400,6 +496,8 @@ export default {
       ordenarPor,
       formatearFecha,
       descargarPDF,
+      descargarCSV,
+      descargandoCSV,
       cargarDatos,
       cambiarPagina,
       cambiarTamanoPagina
@@ -469,6 +567,21 @@ export default {
   background: #FFE000;
 }
 
+.btn-csv {
+  background: #0067b1;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 1rem;
+}
+
+.btn-csv:hover {
+  background: #005494;
+}
+
 .resultados-info {
   margin-bottom: 1rem;
 }
@@ -477,6 +590,50 @@ export default {
   color: #666;
   margin: 0;
   font-size: 0.9rem;
+}
+
+/* Layout: place the export button to the right of the resultados-text */
+.resultados-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.resultados-text {
+  margin: 0;
+  color: #666;
+}
+
+.btn-descargar-csv {
+  background: linear-gradient(180deg, #FFD000, #E6B800);
+  color: #2D2D2D;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 6px 18px rgba(45, 45, 45, 0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.btn-descargar-csv:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-descargar-csv:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(45, 45, 45, 0.16);
+}
+
+.csv-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .tabla-container {
@@ -724,6 +881,16 @@ export default {
   .info-paginacion {
     flex-direction: column;
     text-align: center;
+  }
+
+  /* Stack resultados info on small screens so button sits below the text */
+  .resultados-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .btn-descargar-csv {
+    align-self: flex-end;
   }
 }
 </style>
